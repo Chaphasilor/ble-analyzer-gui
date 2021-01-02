@@ -5,15 +5,13 @@ import API from '@/assets/js/api'
 Vue.use(Vuex)
 
 const websocketUrl = `ws://127.0.0.1`
-setTimeout(() => {
-  new API(websocketUrl)
-}, 5000)
+let api = new API(websocketUrl)
 
 export default new Vuex.Store({
   modules: {
   },
   state: {
-    packets: []
+    packets: [],
   },
   mutations: {
     SET_PACKETS(store, packets) {
@@ -29,9 +27,19 @@ export default new Vuex.Store({
       console.log(`newPackets:`, newPackets);
       context.commit(`ADD_PACKETS`, newPackets)
       
+    },
+    connectToServer() {
+
+      api.connectToServer()
+      
+    },
+    clearPackets(context) {
+
+      context.commit(`SET_PACKETS`, [])
+      
     }
   },
   getters: {
-    packets: (store) => store.packets
+    packets: (store) => store.packets,
   }
 })

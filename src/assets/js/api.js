@@ -4,12 +4,7 @@ export default class API {
 
   constructor(url) {
 
-    this.socket = new WebSocket(url)
-    this.socket.onopen = () => {
-      console.log(`Socket opened!`)
-    }
-
-    this.socket.onmessage = this.handleMessage
+    this.url = url
 
   }
 
@@ -35,6 +30,18 @@ export default class API {
       dotifiedNumber = `${reversedNumberAsString.charAt(i)}${(i%3===0 && i!=0) ? `.` : ``}${dotifiedNumber}`;
     }
     return dotifiedNumber;
+    
+  }
+
+  connectToServer() {
+
+    this.socket = new WebSocket(this.url)
+
+    this.socket.onopen = () => {
+      console.log(`Socket opened!`)
+    }
+
+    this.socket.onmessage = this.handleMessage
     
   }
 

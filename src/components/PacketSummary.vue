@@ -1,14 +1,14 @@
 <template>
   <div
-    class="grid grid-flow-row grid-cols-6 grid-rows-1 gap-2"
+    class="grid grid-flow-row grid-cols-6 grid-rows-1 gap-2 text-center"
   >
 
-    <span>{{ packetId }}</span>
-    <span>{{ microseconds }}</span>
-    <span>{{ source }}</span>
-    <span>{{ destination }}</span>
-    <span>{{ protocols }}</span>
-    <span>{{ length }}</span>
+    <span>{{ source.packetId }}</span>
+    <span>{{ source.microseconds }}</span>
+    <span>{{ source.source }}</span>
+    <span>{{ source.destination }}</span>
+    <span>{{ source.protocols }}</span>
+    <span>{{ source.length }}</span>
     
   </div>
 </template>
@@ -16,30 +16,15 @@
 <script>
 export default {
   props: {
-    packetId: {
+    index: {
       type: Number,
-      required: true,
-    },
-    microseconds: {
-      type: Number,
-      required: true,
     },
     source: {
-      type: String,
-      required: true,
-    },
-    destination: {
       type: Object,
-      required: true,
-    },
-    protocols: {
-      type: Array,
-      required: true,
-    },
-    length: {
-      type: Number,
-      required: true,
-    },
+      default() {
+        return {}
+      }
+    }
   }
 }
 </script>

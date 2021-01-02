@@ -14,7 +14,12 @@ module.exports = {
   ],
   darkMode: `media`,
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateRows: {
+        // Simple 8 row grid
+       'layout': '2.5rem minmax(10rem, 1fr) 16rem',
+      }
+    },
   },
   variants: {},
   plugins: [],
