@@ -1,13 +1,14 @@
 <template>
   <div
-    class="grid grid-flow-row grid-cols-6 grid-rows-1 gap-2 text-center"
+    class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b border-gray-700 grid-cols-packet-list"
   >
 
     <span>{{ source.packetId }}</span>
-    <span>{{ source.microseconds }}</span>
+    <span>{{ `${String(date.getHours()).padStart(2, `0`)}:${String(date.getMinutes()).padStart(2, `0`)}:${String(date.getSeconds()).padStart(2, `0`)}.${String(date.getMilliseconds()).padEnd(3, `0`)}${String(source.microseconds).slice(-3).padEnd(3, `0`)}` }}</span>
     <span>{{ source.source }}</span>
-    <span>{{ source.destination }}</span>
-    <span>{{ source.protocols }}</span>
+    <span v-if="source.destination.type == `broadcast`">Broadcast</span>
+    <span v-else>{{ source.destination.address }}</span>
+    <span>{{ source.protocols.join(`, `) }}</span>
     <span>{{ source.length }}</span>
     
   </div>
@@ -24,6 +25,11 @@ export default {
       default() {
         return {}
       }
+    }
+  },
+  computed: {
+    date() {
+      return new Date(Math.round(this.source.microseconds/1000))
     }
   }
 }
