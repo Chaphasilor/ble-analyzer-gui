@@ -33,26 +33,81 @@ export default class API {
     
   }
 
-  connectToServer() {
-
-    this.socket = new WebSocket(this.url)
-
-    this.socket.onopen = () => {
-      console.log(`Socket opened!`)
-    }
-
-    this.socket.onmessage = this.handleMessage
-    
-  }
-
-  handleMessage(message) {
+  parseMessage(message) {
 
     // console.log(`message:`, message);
     
-    let parsed = JSON.parse(message.data)
+    try {
+      return JSON.parse(message.data)
+    } catch (err) {
+      return false
+    }
 
-    store.dispatch(`addPackets`, parsed)
+  }
+
+  //TODO
+  // - rename send to sendCommand, pass command and value as params
+  // - have sendCommand unlink the responseHandler, when a `commandEnd` message arrives from the server
+  // - remember all running commands in an array. only the last/newest command's handler is called to handle messages. once the responseHandler gets unlinked, pop the command and "return" to the previous handler
+  // - server should not send anything other than the requested data after a command is issued and before it is has ended => pause all other data (like live data)
+
+  send(data, responseHandler) {
+
+    this.socket.send(JSON.stringify(data))
+
+    //TODO allow to unlink handler
+    this.socket.onmessage = (message) => {
+      responseHandler(this.parseMessage(message))
+    }
+
+  }
+  
+  connectToServer() {
+    return new Promise((resolve, reject) => {
     
+      this.socket = new WebSocket(this.url)
+  
+      this.socket.onopen = () => {
+        console.log(`Socket opened!`)
+        return resolve()
+      }
+
+      this.socket.onerror = (error) => {
+        return reject(error)
+      }
+    
+    })
+  }
+
+  getLivePackets() {
+
+    this.send({
+      type: `command`,
+      value: [
+        `live`
+      ]
+    }, (response) => {
+      store.dispatch(`addPackets`, response)
+    })
+    
+  }
+
+  loadPacket(packetId) {
+    return new Promise((resolve) => {
+    
+      console.log(`packetId:`, packetId);
+
+      this.send({
+        type: `command`,
+        value: [
+          `send`,
+          packetId,
+        ]
+      }, (response) => {
+        return resolve(response)
+      })
+    
+    })
   }
 
 }

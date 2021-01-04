@@ -30,14 +30,25 @@ export default new Vuex.Store({
     },
     connectToServer() {
 
-      api.connectToServer()
+      api.connectToServer().then(() => {
+
+        api.getLivePackets()
+        
+      })
       
     },
     clearPackets(context) {
 
       context.commit(`SET_PACKETS`, [])
       
-    }
+    },
+    async loadPacket(context, packetId) {
+
+      let packet = await api.loadPacket(packetId) // might throw an error
+
+      return packet
+      
+    },
   },
   getters: {
     packets: (store) => store.packets,
