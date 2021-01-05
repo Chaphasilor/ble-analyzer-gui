@@ -1,9 +1,9 @@
 <template>
   <div>
 
-    Packet Details (ID {{ routeParams.packetId }})
+    <!-- Packet Details (ID {{ routeParams.packetId }})
 
-    <br>
+    <br> -->
 
     {{ packet }}
     

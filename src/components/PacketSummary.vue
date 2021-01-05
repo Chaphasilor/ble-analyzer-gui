@@ -13,6 +13,18 @@
     <span>{{ `${String(date.getHours()).padStart(2, `0`)}:${String(date.getMinutes()).padStart(2, `0`)}:${String(date.getSeconds()).padStart(2, `0`)}.${String(date.getMilliseconds()).padEnd(3, `0`)}${String(source.microseconds).slice(-3).padEnd(3, `0`)}` }}</span>
     <span>{{ source.source }}</span>
     <span v-if="source.destination.type == `broadcast`">Broadcast</span>
+    <span
+      v-else-if="source.destination.type == `scan_req`"
+      class="bg-yellow-300"
+    >
+      {{ source.destination.address }}
+    </span>
+    <span
+      v-else-if="source.destination.type == `connect_req`"
+      class="bg-purple-300"
+    >
+      {{ source.destination.address }}
+    </span>
     <span v-else>{{ source.destination.address }}</span>
     <span>{{ source.protocols.join(`, `) }}</span>
     <span>{{ source.length }}</span>

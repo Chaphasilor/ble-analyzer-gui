@@ -47,6 +47,7 @@ export default class API {
 
   //TODO
   // - rename send to sendCommand, pass command and value as params
+  // - use Websocket.on(`message`) instead of Websocket.onmessage to support multiple event listeners
   // - have sendCommand unlink the responseHandler, when a `commandEnd` message arrives from the server
   // - remember all running commands in an array. only the last/newest command's handler is called to handle messages. once the responseHandler gets unlinked, pop the command and "return" to the previous handler
   // - server should not send anything other than the requested data after a command is issued and before it is has ended => pause all other data (like live data)
@@ -102,6 +103,7 @@ export default class API {
         value: [
           `send`,
           packetId,
+          `full`
         ]
       }, (response) => {
         return resolve(response)
