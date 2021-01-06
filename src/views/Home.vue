@@ -20,9 +20,16 @@
           Clear Packets
         </button>
         <button
+          class="p-2 mr-1 text-white bg-lightblue-600"
+          type="button"
+          @click="$store.dispatch(`loadAllPackets`)"
+        >
+          Load All Packets
+        </button>
+        <button
           class="p-2 text-white bg-lightblue-600"
           type="button"
-          @click="$store.dispatch(`connectToServer`)"
+          @click="$store.dispatch(`receiveLivePackets`)"
         >
           Receive Packets
         </button>

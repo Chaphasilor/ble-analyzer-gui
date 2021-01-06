@@ -30,12 +30,30 @@ export default new Vuex.Store({
     },
     connectToServer() {
 
-      api.connectToServer().then(() => {
-
-        api.getLivePackets()
-        
+      api.connectToServer()
+      .then(() => {
+        console.log(`Connected to socket!`)
+      })
+      .catch(err => {
+        console.error(`Error while connecting to the socket:`, err);
       })
       
+    },
+    receiveLivePackets() {
+      api.getLivePackets()
+    },
+    loadAllPackets() {
+
+      api.loadAllPackets()
+      .then(() => {
+        console.log(`Loaded all packets!`)
+      })
+      .catch(err => {
+
+        console.error(`Error while loading all packets:`, err);
+
+      })
+
     },
     clearPackets(context) {
 
