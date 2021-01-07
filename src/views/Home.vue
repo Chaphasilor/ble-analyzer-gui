@@ -43,10 +43,13 @@
     />
 
     <div
-      class="border-t-4 border-gray-700"
+      class="text-xl border-t-4 border-gray-700"
     >
       TODO: 
       Show Warnings and Alerts here
+      <br>
+      <br>
+      Things like missing packets, protocol errors, timeouts, low RSSIs, etc.
     </div>
     
   </div>

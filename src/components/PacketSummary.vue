@@ -1,6 +1,8 @@
 <template>
   <div
     class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list"
+    :class="source.malformed ? `bg-red-200 hover:bg-red-400` : ``"
+    :title="source.malformed ? `This packet is malformed` : ``"
     @click="$router.push({
       name: `PacketDetails`,
       params: {
@@ -15,13 +17,13 @@
     <span v-if="source.destination.type == `broadcast`">Broadcast</span>
     <span
       v-else-if="source.destination.type == `scan_req`"
-      class="bg-yellow-300"
+      class="bg-yellow-200"
     >
       {{ source.destination.address }}
     </span>
     <span
       v-else-if="source.destination.type == `connect_req`"
-      class="bg-purple-300"
+      class="bg-purple-200"
     >
       {{ source.destination.address }}
     </span>

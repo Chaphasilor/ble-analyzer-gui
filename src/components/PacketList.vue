@@ -12,7 +12,7 @@
       <span>Source Address</span>
       <span>Destination Address</span>
       <span>Protocols</span>
-      <span>Bytes</span>
+      <span>Length</span>
       
     </div>
 
