@@ -45,7 +45,8 @@
     <div
       class="border-t-4 border-gray-700"
     >
-      Details (about sniffing or <span class="italic">maybe</span> even packets)
+      TODO: 
+      Show Warnings and Alerts here
     </div>
     
   </div>

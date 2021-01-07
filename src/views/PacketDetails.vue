@@ -24,6 +24,11 @@
       </tr>
 
       <tr>
+        <td>Channel Number</td>
+        <td>{{ packet.channel }}</td>
+      </tr>
+
+      <tr>
         <td>Type of Packet</td>
         <td>{{ packet.destination.type }}</td>
       </tr>
@@ -92,7 +97,17 @@
       </tr>
       
     </table>
+
+    <button
+      class="block p-2 text-white bg-lightblue-600"
+      type="button"
+      @click="showConnection"
+    >
+      Show Connection
+    </button>
     
+    <br>
+    <br>
     {{ packet }}
     
   </div>
@@ -123,6 +138,11 @@ export default {
     date() {
       return new Date(Math.round(this.packet.microseconds/1000))
     },
+  },
+  methods: {
+    showConnection() {
+      //TODO implement this
+    }
   },
   mounted() {
 

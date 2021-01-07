@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b border-gray-700 grid-cols-packet-list"
+    class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list"
     @click="$router.push({
       name: `PacketDetails`,
       params: {

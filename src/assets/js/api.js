@@ -5,6 +5,7 @@ export default class API {
   constructor(url) {
 
     this.url = url
+    this.activeCommands = []
 
   }
 
@@ -40,7 +41,7 @@ export default class API {
     try {
       return JSON.parse(message.data)
     } catch (err) {
-      return false
+      throw new Error(`Couldn't parse message:`, err)
     }
 
   }
@@ -99,34 +100,86 @@ export default class API {
     }
 
   }
+
+  async sendCommand(command, payload, responseHandler) {
+    
+    if (!this.connected) {
+
+      try {
+        await this.connectToServer()
+      } catch (err) {
+        throw new Error(`Fatal: Failed to open websocket:`, err)
+      }
+      
+    }
+    
+    this.socket.send(JSON.stringify({
+      type: `command`,
+      value: [
+        command,
+        ...payload
+      ]
+    }))
+    this.activeCommands.push({
+      name: command,
+      handler: responseHandler,
+    })
+
+    this.socket.onmessage = (message) => {
+
+      let parsed = this.parseMessage(message)
+
+      console.log(`parsed:`, parsed);
+  
+      let command = this.activeCommands.find(x => x.name === parsed.value[0])
+  
+      if (!command) {
+        throw new Error(`Command not found: ${command}`)
+      }
+  
+      switch (parsed.type) {
+        case `response`:
+            command.handler(parsed.value[1])    
+          break;
+        case `commandEnd`:
+          this.activeCommands = this.activeCommands.filter(x => x !== command)
+          break;
+      
+        case `error`:
+          console.error(`Command ${parsed.value[0]} threw an error:`, parsed.value[1])
+          break;
+      
+        default:
+          break;
+      }
+    
+      
+    }
+
+  }
   
   getLivePackets() {
 
-    this.send({
-      type: `command`,
-      value: [
-        `live`
-      ]
-    }, (response) => {
-      store.dispatch(`addPackets`, response)
-    })
+    this.sendCommand(`live`,
+      [],
+      (response) => {
+        console.log(`response:`, response);
+        store.dispatch(`addPackets`, response)
+      }
+    )
     
   }
   
   loadAllPackets() {
     return new Promise((resolve) => {
     
-      this.send({
-        type: `command`,
-        value: [
-          `sendAll`
-        ]
-      }, (response) => {
-  
-        store.dispatch(`addPackets`, response)
-        return resolve()
-        
-      })
+      this.sendCommand(`sendAll`,
+        [],
+        (response) => {
+          store.dispatch(`addPackets`, response)
+          return resolve()
+        }
+      )
     
     })
   }
@@ -136,17 +189,16 @@ export default class API {
     
       console.log(`packetId:`, packetId);
 
-      this.send({
-        type: `command`,
-        value: [
-          `send`,
+      this.sendCommand(`send`,
+        [
           packetId,
-          `full`
-        ]
-      }, (response) => {
-        console.log(`response:`, response);
-        return resolve(response)
-      })
+          `full`,
+        ],
+        (response) => {
+          console.log(`response:`, response);
+          return resolve(response)
+        }
+      )
     
     })
   }
