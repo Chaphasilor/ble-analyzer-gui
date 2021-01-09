@@ -140,9 +140,9 @@
       
     </div>
 
+      <!-- <br>
       <br>
-      <br>
-      {{ packet }}
+      {{ packet }} -->
 
   </div>
 </template>
