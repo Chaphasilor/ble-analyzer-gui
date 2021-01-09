@@ -17,7 +17,10 @@ module.exports = {
     extend: {
       gridTemplateRows: {
         // Simple 8 row grid
-       'layout': '2.5rem minmax(10rem, 1fr) 16rem',
+        'layout': '2.5rem minmax(10rem, 1fr) 16rem',
+      },
+      gridTemplateColumns: {
+        'packet-list': '5ch 1fr 1fr 1fr 3fr 7ch',
       }
     },
   },

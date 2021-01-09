@@ -20,9 +20,16 @@
           Clear Packets
         </button>
         <button
+          class="p-2 mr-1 text-white bg-lightblue-600"
+          type="button"
+          @click="$store.dispatch(`loadAllPackets`)"
+        >
+          Load All Packets
+        </button>
+        <button
           class="p-2 text-white bg-lightblue-600"
           type="button"
-          @click="$store.dispatch(`connectToServer`)"
+          @click="$store.dispatch(`receiveLivePackets`)"
         >
           Receive Packets
         </button>
@@ -36,9 +43,13 @@
     />
 
     <div
-      class="border-t-4 border-gray-700"
+      class="text-xl border-t-4 border-gray-700"
     >
-      Details (about sniffing or <span class="italic">maybe</span> even packets)
+      TODO: 
+      Show Warnings and Alerts here
+      <br>
+      <br>
+      Things like missing packets, protocol errors, timeouts, low RSSIs, etc.
     </div>
     
   </div>

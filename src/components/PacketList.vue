@@ -4,15 +4,15 @@
   >
 
     <div
-      class="grid grid-flow-row grid-cols-6 grid-rows-1 gap-2 text-center border-b border-gray-700"
+      class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b-2 border-gray-700 grid-cols-packet-list"
     >
 
-      <span>Packet ID</span>
-      <span>Microseconds</span>
-      <span>Source</span>
-      <span>Destination</span>
+      <span>ID</span>
+      <span>Arrival Time</span>
+      <span>Source Address</span>
+      <span>Destination Address</span>
       <span>Protocols</span>
-      <span>Packet Length</span>
+      <span>Length</span>
       
     </div>
 
@@ -21,8 +21,7 @@
       :data-key="'packetId'"
       :data-sources="packets"
       :data-component="PacketSummaryComponent"
-      header-tag="div"
-      header-class="grid grid-flow-row grid-cols-6 grid-rows-1 gap-2 text-center border-b border-gray-700"
+      :keeps="50"
     />
     
   </div>
