@@ -12,6 +12,7 @@ export default new Vuex.Store({
   },
   state: {
     packets: [],
+    connections: [],
   },
   mutations: {
     SET_PACKETS(store, packets) {
@@ -20,13 +21,16 @@ export default new Vuex.Store({
     ADD_PACKETS(store, packetsToAdd) {
       store.packets.push(...packetsToAdd)
     },
+    SET_CONNECTIONS(store, connections) {
+      store.connections = connections
+    },
 },
   actions: {
     addPackets(context, newPackets) {
-
-      console.log(`newPackets:`, newPackets);
       context.commit(`ADD_PACKETS`, newPackets)
-      
+    },
+    setConnections(context, newConnections) {
+      context.commit(`SET_CONNECTIONS`, newConnections)
     },
     connectToServer() {
 
@@ -67,8 +71,22 @@ export default new Vuex.Store({
       return packet
       
     },
+    loadAllConnections() {
+
+      api.loadAllConnections()
+      .then(() => {
+        console.log(`Loaded all connections!`)
+      })
+      .catch(err => {
+
+        console.error(`Error while loading all connections:`, err);
+
+      })
+
+    },
   },
   getters: {
     packets: (store) => store.packets,
+    connections: (store) => store.connections,
   }
 })

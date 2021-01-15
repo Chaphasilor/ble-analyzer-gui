@@ -10,14 +10,16 @@
         class="text-2xl font-bold text-lightblue-600"
       >BLE Analyzer</h1>
 
-      <div>
+      <div
+        class="flex flex-row-reverse"
+      >
 
         <button
-          class="p-2 mr-1 text-white bg-lightblue-600"
+          class="p-2 text-white bg-lightblue-600"
           type="button"
-          @click="$store.dispatch(`clearPackets`)"
+          @click="$store.dispatch(`receiveLivePackets`)"
         >
-          Clear Packets
+          Receive Packets
         </button>
         <button
           class="p-2 mr-1 text-white bg-lightblue-600"
@@ -27,11 +29,18 @@
           Load All Packets
         </button>
         <button
-          class="p-2 text-white bg-lightblue-600"
+          class="p-2 mr-1 text-white bg-lightblue-600"
           type="button"
-          @click="$store.dispatch(`receiveLivePackets`)"
+          @click="$store.dispatch(`loadAllConnections`)"
         >
-          Receive Packets
+          Load Connections
+        </button>
+        <button
+          class="p-2 mr-1 text-white bg-lightblue-600"
+          type="button"
+          @click="$store.dispatch(`clearPackets`)"
+        >
+          Clear Packets
         </button>
         
       </div>
@@ -50,6 +59,12 @@
       <br>
       <br>
       Things like missing packets, protocol errors, timeouts, low RSSIs, etc.
+    
+      <br>
+      <br>
+    
+      {{ $store.getters.connections }}
+
     </div>
     
   </div>
