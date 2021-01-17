@@ -43,8 +43,11 @@ export default new Vuex.Store({
       })
       
     },
-    receiveLivePackets() {
-      api.getLivePackets()
+    async receiveLivePackets() {
+
+      await api.getLivePackets()
+      await api.getLiveConnections()
+
     },
     loadAllPackets() {
 

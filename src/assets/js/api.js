@@ -150,13 +150,25 @@ export default class API {
 
   }
   
-  getLivePackets() {
+  async getLivePackets() {
 
-    this.sendCommand(`live`,
+    await this.sendCommand(`live`,
       [],
       (response) => {
         console.log(`response:`, response);
         store.dispatch(`addPackets`, response)
+      }
+    )
+    
+  }
+
+  async getLiveConnections() {
+
+    await this.sendCommand(`connectionsLive`,
+      [],
+      (response) => {
+        console.log(`response:`, response);
+        store.dispatch(`setConnections`, response)
       }
     )
     
