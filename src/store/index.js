@@ -12,6 +12,8 @@ export default new Vuex.Store({
   },
   state: {
     packets: [],
+    connections: [],
+    packetFilter: [],
   },
   mutations: {
     SET_PACKETS(store, packets) {
@@ -20,13 +22,22 @@ export default new Vuex.Store({
     ADD_PACKETS(store, packetsToAdd) {
       store.packets.push(...packetsToAdd)
     },
+    SET_CONNECTIONS(store, connections) {
+      store.connections = connections
+    },
+    SET_PACKET_FILTER(store, filter) {
+      store.packetFilter = filter
+    },
 },
   actions: {
     addPackets(context, newPackets) {
-
-      console.log(`newPackets:`, newPackets);
       context.commit(`ADD_PACKETS`, newPackets)
-      
+    },
+    setConnections(context, newConnections) {
+      context.commit(`SET_CONNECTIONS`, newConnections)
+    },
+    setPacketFilter(context, filter = []) {
+      context.commit(`SET_PACKET_FILTER`, filter)
     },
     connectToServer() {
 
@@ -39,8 +50,11 @@ export default new Vuex.Store({
       })
       
     },
-    receiveLivePackets() {
-      api.getLivePackets()
+    async receiveLivePackets() {
+
+      await api.getLivePackets()
+      await api.getLiveConnections()
+
     },
     loadAllPackets() {
 
@@ -60,6 +74,16 @@ export default new Vuex.Store({
       context.commit(`SET_PACKETS`, [])
       
     },
+    clearConnections(context) {
+
+      context.commit(`SET_CONNECTIONS`, [])
+      
+    },
+    clearPacketFilter(context) {
+
+      context.commit(`SET_PACKET_FILTER`, [])
+      
+    },
     async loadPacket(context, packetId) {
 
       let packet = await api.loadPacket(packetId) // might throw an error
@@ -67,8 +91,23 @@ export default new Vuex.Store({
       return packet
       
     },
+    loadAllConnections() {
+
+      api.loadAllConnections()
+      .then(() => {
+        console.log(`Loaded all connections!`)
+      })
+      .catch(err => {
+
+        console.error(`Error while loading all connections:`, err);
+
+      })
+
+    },
   },
   getters: {
     packets: (store) => store.packets,
+    connections: (store) => store.connections,
+    packetFilter: (store) => store.packetFilter,
   }
 })

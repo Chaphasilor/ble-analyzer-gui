@@ -62,7 +62,7 @@
 
         <tr>
           <td>Type of Packet</td>
-          <td>{{ packet.destination.type }}</td>
+          <td>{{ packet.type }}</td>
         </tr>
         
         <tr>
@@ -71,10 +71,10 @@
         </tr>
 
         <tr
-          v-if="packet.destination.type != `broadcast`"
+          v-if="packet.destination !== ``"
         >
           <td>Destination Device Address</td>
-          <td>{{ packet.destination.address }}</td>
+          <td>{{ packet.destination }}</td>
         </tr>
 
         <tr>
@@ -131,6 +131,7 @@
       </table>
 
       <button
+        v-if="packet.connection.isPartOfConnection"
         class="block p-2 text-white bg-lightblue-600"
         type="button"
         @click="showConnection"
@@ -156,11 +157,15 @@ export default {
         malformed: false,
         packetId: null,
         microseconds: null,
-        source: ``,
-        destination: {
-          type: `unknown`,
-          address: ``,
+        connection: {
+          isPartOfConnection: false,
+          accessAddress: ``,
+          master: ``,
+          slave: ``,
         },
+        type: `unknown`,
+        source: ``,
+        destination: ``,
         protocols: [],
         length: null
       },
@@ -176,7 +181,13 @@ export default {
   },
   methods: {
     showConnection() {
-      //TODO implement this
+
+      // filter applies to packetSummary object
+      this.$store.dispatch(`setPacketFilter`, [
+        [[`isPartOfConnection`], this.packet.connection.isPartOfConnection],
+        [[`accessAddress`], this.packet.connection.accessAddress],
+      ])
+      
     }
   },
   mounted() {
@@ -184,6 +195,7 @@ export default {
     this.$store.dispatch(`loadPacket`, this.routeParams.packetId).then((packet) => {
       console.log(`this.packet:`, JSON.parse(JSON.stringify(packet)));
       this.packet = packet
+      console.log(`this.packet.connection:`, this.packet.connection)
     })
     
   }

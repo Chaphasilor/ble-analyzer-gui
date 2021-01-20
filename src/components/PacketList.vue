@@ -9,7 +9,7 @@
 
       <span>ID</span>
       <span>Arrival Time</span>
-      <span>Source Address</span>
+      <span>Access/Source Address</span>
       <span>Destination Address</span>
       <span>Protocols</span>
       <span>Length</span>
@@ -19,7 +19,7 @@
     <VirtualList
       class="h-full overflow-y-auto"
       :data-key="'packetId'"
-      :data-sources="packets"
+      :data-sources="filteredPackets"
       :data-component="PacketSummaryComponent"
       :keeps="50"
     />
@@ -45,7 +45,35 @@ export default {
   computed: {
     packets: function() {
       return this.$store.getters.packets
-    }
+    },
+    filteredPackets: function() {
+
+      let filter = this.$store.getters.packetFilter
+      
+      if (filter.length === 0) {
+        return this.packets
+      }
+
+      console.log(`filter:`, filter)
+
+      return this.packets.filter(packet => {
+        return filter.every(([key, value]) => {
+
+          let base = packet
+          for (const subkey of key) {
+            if (base) {
+              base = base[subkey]
+            } else {
+              return false
+            }
+          }
+
+          return base == value
+          
+        })
+      })
+      
+    },
   },
   mounted() {
 
