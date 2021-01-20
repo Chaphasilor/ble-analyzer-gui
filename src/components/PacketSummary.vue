@@ -22,20 +22,20 @@
       v-else
     >{{ source.source }}</span>
 
-    <span v-if="source.destination.type == `broadcast`">Broadcast</span>
+    <span v-if="source.destination === ``">Broadcast/Advertisement</span>
     <span
-      v-else-if="source.destination.type == `scan_req`"
+      v-else-if="[`SCAN_REQ`, `SCAN_RESP`].includes(source.type)"
       class="bg-yellow-200"
     >
-      {{ source.destination.address }}
+      {{ source.destination }}
     </span>
     <span
-      v-else-if="source.destination.type == `connect_req`"
+      v-else-if="[`CONNECT_REQ`].includes(source.type)"
       class="bg-purple-200"
     >
-      {{ source.destination.address }}
+      {{ source.destination }}
     </span>
-    <span v-else>{{ source.destination.address }}</span>
+    <span v-else>{{ source.destination }}</span>
     <span>{{ source.protocols.join(`, `) }}</span>
     <span>{{ source.length }}</span>
     
