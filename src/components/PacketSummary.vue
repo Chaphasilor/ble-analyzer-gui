@@ -3,12 +3,7 @@
     class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list"
     :class="source.malformed ? `bg-red-200 hover:bg-red-400` : ``"
     :title="source.malformed ? `This packet is malformed` : ``"
-    @click="$router.push({
-      name: `PacketDetails`,
-      params: {
-        packetId: source.packetId,
-      }
-    })"
+    @dblclick="$store.dispatch(`selectPacket`, source.packetId); clearSelection();"
   >
 
     <span>{{ source.packetId }}</span>
@@ -74,6 +69,9 @@ export default {
 
       return luma > 128 ? `light` : `dark`
       
+    },
+    clearSelection() {
+      window.getSelection().removeAllRanges()
     }
   }
 }

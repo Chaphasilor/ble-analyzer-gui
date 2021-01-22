@@ -16,10 +16,14 @@ module.exports = {
   theme: {
     extend: {
       gridTemplateRows: {
+        // 'main': `4rem 3rem 3fr 1fr`,
+        'main': `3rem minmax(0, 1fr)`,
+        'left': `2rem minmax(0, 3fr) 1fr`,
         // Simple 8 row grid
         'layout': '2.5rem minmax(10rem, 1fr) 16rem',
       },
       gridTemplateColumns: {
+        'main': `2fr 1fr`,
         'packet-list': '5ch 1fr 1fr 1fr 3fr 7ch',
       }
     },

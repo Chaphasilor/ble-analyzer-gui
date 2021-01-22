@@ -138,7 +138,7 @@ export default class API {
           break;
       
         case `error`:
-          console.error(`Command ${parsed.value[0]} threw an error:`, parsed.value[1])
+          console.error(`Command '${parsed.value[0]}' threw an error:`, parsed.value[1])
           break;
       
         default:

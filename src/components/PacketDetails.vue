@@ -4,23 +4,19 @@
   >
 
     <div
-      class="flex flex-row justify-between w-full h-10 text-left bg-gray-300"
+      class="relative w-full h-10 text-center bg-gray-300"
     >
       <h1
         class="text-2xl font-bold text-lightblue-600"
       >BLE Analyzer</h1>
 
-      <div>
-
-        <button
-          class="p-2 text-white bg-lightblue-600"
-          type="button"
-          @click="$router.back()"
-        >
-          Back to Overview
-        </button>
-        
-      </div>
+      <button
+        class="absolute top-0 left-0 p-2 text-white bg-orange-400"
+        type="button"
+        @click="$emit(`input`, false)"
+      >
+        Close
+      </button>
       
     </div>
 
@@ -31,7 +27,7 @@
       <h1
         class="mb-6 text-2xl"
       >
-        Packet {{ routeParams.packetId }} - Details
+        Packet {{ selectedPacket }} - Details
       </h1>
 
       <div
@@ -151,6 +147,9 @@
 <script>
 export default {
   name: `PacketDetails`,
+  props: {
+    value: Boolean,
+  },
   data() {
     return {
       packet: {
@@ -172,14 +171,30 @@ export default {
     }
   },
   computed: {
-    routeParams() {
-      return this.$route.params
+    selectedPacket() {
+      return this.$store.getters.selectedPacket
     },
     date() {
       return new Date(Math.round(this.packet.microseconds/1000))
     },
   },
+  watch: {
+    selectedPacket() {
+      if (!isNaN(this.selectedPacket)) {
+        this.loadPacket()
+      }
+    }
+  },
   methods: {
+    loadPacket() {
+
+      this.$store.dispatch(`loadPacket`, this.selectedPacket).then((packet) => {
+        console.log(`this.packet:`, JSON.parse(JSON.stringify(packet)));
+        this.packet = packet
+        console.log(`this.packet.connection:`, this.packet.connection)
+      })
+        
+    },
     showConnection() {
 
       // filter applies to packetSummary object
@@ -192,11 +207,7 @@ export default {
   },
   mounted() {
 
-    this.$store.dispatch(`loadPacket`, this.routeParams.packetId).then((packet) => {
-      console.log(`this.packet:`, JSON.parse(JSON.stringify(packet)));
-      this.packet = packet
-      console.log(`this.packet.connection:`, this.packet.connection)
-    })
+    this.loadPacket()
     
   }
 }

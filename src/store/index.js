@@ -14,6 +14,7 @@ export default new Vuex.Store({
     packets: [],
     connections: [],
     packetFilter: [],
+    selectedPacket: NaN,
   },
   mutations: {
     SET_PACKETS(store, packets) {
@@ -28,6 +29,9 @@ export default new Vuex.Store({
     SET_PACKET_FILTER(store, filter) {
       store.packetFilter = filter
     },
+    SET_SELECTED_PACKET(store, packetId) {
+      store.selectedPacket = packetId
+    },
 },
   actions: {
     addPackets(context, newPackets) {
@@ -38,6 +42,10 @@ export default new Vuex.Store({
     },
     setPacketFilter(context, filter = []) {
       context.commit(`SET_PACKET_FILTER`, filter)
+    },
+    selectPacket(context, packetId) {
+      context.commit(`SET_SELECTED_PACKET`, packetId)
+      console.log(`packetId:`, packetId)
     },
     connectToServer() {
 
@@ -109,5 +117,6 @@ export default new Vuex.Store({
     packets: (store) => store.packets,
     connections: (store) => store.connections,
     packetFilter: (store) => store.packetFilter,
+    selectedPacket: (store) => store.selectedPacket,
   }
 })

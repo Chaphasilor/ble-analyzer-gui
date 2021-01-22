@@ -17,6 +17,7 @@
     </div>
 
     <VirtualList
+      ref="packet-list"
       class="h-full overflow-y-auto"
       :data-key="'packetId'"
       :data-sources="filteredPackets"
@@ -75,9 +76,22 @@ export default {
       
     },
   },
+  watch: {
+    filteredPackets() {
+      // scroll list (to top) to force re-rendering 
+      this.$refs[`packet-list`].scrollToIndex(0)
+    }
+  },
   mounted() {
 
     console.log(`this.packets:`, this.packets);
+
+    // prevent text selection on double click without preventing text selection by dragging
+    document.addEventListener('mousedown', function (event) {
+      if (event.detail > 1) {
+        event.preventDefault();
+      }
+    }, false);
     
   }
 }
