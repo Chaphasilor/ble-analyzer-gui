@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list"
+    class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list"
     :class="source.malformed ? `bg-red-200 hover:bg-red-400` : ``"
     :title="source.malformed ? `This packet is malformed` : ``"
     @dblclick="$store.dispatch(`selectPacket`, source.packetId); clearSelection();"
@@ -9,29 +9,45 @@
     <span>{{ source.packetId }}</span>
     <span>{{ `${String(date.getHours()).padStart(2, `0`)}:${String(date.getMinutes()).padStart(2, `0`)}:${String(date.getSeconds()).padStart(2, `0`)}.${String(date.getMilliseconds()).padEnd(3, `0`)}${String(source.microseconds).slice(-3).padEnd(3, `0`)}` }}</span>
     
+    <span>{{ source.channel }}</span>
+    <span>{{ source.rssi }}</span>
     <span
-      v-if="source.isPartOfConnection"
-      :style="`background-color: #${accessAddressToColor(source.accessAddress)}; color: ${colorLightOrDark(accessAddressToColor(source.accessAddress)) === `light` ? `black` : `white`}`"
-    >{{ source.accessAddress }}</span>
-    <span
-      v-else
-    >{{ source.source }}</span>
+      class="font-mono"
+    >{{ source.type }}</span>
+    
+    <div
+      class="font-mono"
+      :style="source.isPartOfConnection ? `background-color: #${accessAddressToColor(source.accessAddress)}; color: ${colorLightOrDark(accessAddressToColor(source.accessAddress)) === `light` ? `black` : `white`}` : ``"
+    >
+      {{ source.isPartOfConnection ? source.accessAddress : `` }}
 
-    <span v-if="source.destination === ``">Broadcast/Advertisement</span>
+      <div
+        class="grid w-full h-full place-items-center"
+      >
+        <svg
+          v-if="!source.isPartOfConnection"
+          class="w-6 h-6 stroke-1.5"
+          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <line x1="12" y1="12" x2="12" y2="12.01" />
+          <path d="M14.828 9.172a4 4 0 0 1 0 5.656" />
+          <path d="M17.657 6.343a8 8 0 0 1 0 11.314" />
+          <path d="M9.168 14.828a4 4 0 0 1 0 -5.656" />
+          <path d="M6.337 17.657a8 8 0 0 1 0 -11.314" />
+        </svg>
+      </div>
+
+    </div>
+
     <span
-      v-else-if="[`SCAN_REQ`, `SCAN_RESP`].includes(source.type)"
-      class="bg-yellow-200"
-    >
-      {{ source.destination }}
-    </span>
-    <span
-      v-else-if="[`CONNECT_REQ`].includes(source.type)"
-      class="bg-purple-200"
-    >
-      {{ source.destination }}
-    </span>
-    <span v-else>{{ source.destination }}</span>
-    <span>{{ source.protocols.join(`, `) }}</span>
+      class="font-mono tracking-tight text-left whitespace-pre-wrap"
+      style="word-spacing: -0.25rem;"
+    >{{
+      source.payload.split(``).reduce((string, char, index) => {
+        return `${string}${char.toUpperCase()}${index % 2 === 0 ? `` : ` `}`
+      }, ``)
+    }}</span>
+
     <span>{{ source.length }}</span>
     
   </div>

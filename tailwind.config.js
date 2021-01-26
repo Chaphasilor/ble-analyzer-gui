@@ -24,7 +24,10 @@ module.exports = {
       },
       gridTemplateColumns: {
         'main': `2fr 1fr`,
-        'packet-list': '5ch 1fr 1fr 1fr 3fr 7ch',
+        'packet-list': '8ch 15ch 8ch 10ch 18ch 15ch minmax(0, 1fr) 8ch',
+      },
+      strokeWidth: {
+        '1.5': `1.5`,
       }
     },
   },

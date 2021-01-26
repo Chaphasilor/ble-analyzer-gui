@@ -3,19 +3,19 @@
     class="flex flex-col"
   >
 
-    <div
-      class="grid grid-flow-row grid-rows-1 gap-2 text-center border-b-2 border-gray-700 grid-cols-packet-list"
-    >
-
-      <span>ID</span>
-      <span>Arrival Time</span>
-      <span>Access/Source Address</span>
-      <span>Destination Address</span>
-      <span>Protocols</span>
-      <span>Length</span>
+      <div
+        class="grid content-center grid-flow-row grid-rows-1 gap-1 pr-4 text-center border-b-2 border-gray-700 grid-cols-packet-list"
+      >
+        <span>ID</span>
+        <span>Time of Arrival</span>
+        <span>Channel</span>
+        <span>RSSI</span>
+        <span>Type</span>
+        <span>Access Address</span>
+        <span>Payload</span>
+        <span>Length</span>
+      </div>
       
-    </div>
-
     <VirtualList
       ref="packet-list"
       class="h-full overflow-y-auto"

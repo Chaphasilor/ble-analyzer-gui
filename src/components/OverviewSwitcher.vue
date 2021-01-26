@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-row"
+    class="grid grid-cols-3 grid-rows-1 gap-1"
   >
 
     <button
