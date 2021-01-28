@@ -84,15 +84,21 @@ export default {
   },
   mounted() {
 
-    console.log(`this.packets:`, this.packets);
-
     // prevent text selection on double click without preventing text selection by dragging
-    document.addEventListener('mousedown', function (event) {
-      if (event.detail > 1) {
-        event.preventDefault();
-      }
-    }, false);
+    document.addEventListener('mousedown', preventSelection, false);
+    
+  },
+  beforeDestroy() {
+
+    document.removeEventListener('mousedown', preventSelection, false);
     
   }
 }
+
+function preventSelection(event) {
+  if (event.detail > 1) {
+    event.preventDefault();
+  }
+}
+
 </script>

@@ -173,6 +173,18 @@ export default class API {
     )
     
   }
+
+  async getLiveAdvertisers() {
+
+    await this.sendCommand(`advertisersLive`,
+      [],
+      (response) => {
+        console.log(`response:`, response);
+        store.dispatch(`setAdvertisers`, response)
+      }
+    )
+    
+  }
   
   loadAllPackets() {
     return new Promise((resolve) => {
@@ -181,6 +193,34 @@ export default class API {
         [],
         (response) => {
           store.dispatch(`addPackets`, response)
+          return resolve()
+        }
+      )
+    
+    })
+  }
+  
+  loadAllConnections() {
+    return new Promise((resolve) => {
+    
+      this.sendCommand(`connections`,
+        [],
+        (response) => {
+          store.dispatch(`setConnections`, response)
+          return resolve()
+        }
+      )
+    
+    })
+  }
+  
+  loadAllAdvertisers() {
+    return new Promise((resolve) => {
+    
+      this.sendCommand(`advertisers`,
+        [],
+        (response) => {
+          store.dispatch(`setAdvertisers`, response)
           return resolve()
         }
       )
@@ -201,20 +241,6 @@ export default class API {
         (response) => {
           console.log(`response:`, response);
           return resolve(response)
-        }
-      )
-    
-    })
-  }
-
-  loadAllConnections() {
-    return new Promise((resolve) => {
-    
-      this.sendCommand(`connections`,
-        [],
-        (response) => {
-          store.dispatch(`setConnections`, response)
-          return resolve()
         }
       )
     

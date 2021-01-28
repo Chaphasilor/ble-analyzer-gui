@@ -14,6 +14,7 @@
       <OverviewSwitcher
         class=""
         :overviews="overviews"
+        onFilterChange="packets"
         v-model="selectedOverview"
       />
       
@@ -23,6 +24,16 @@
 
         <PacketList
           v-if="selectedOverview === `packets`"
+          class="h-full"
+        />
+
+        <ConnectionList
+          v-if="selectedOverview === `connections`"
+          class="h-full"
+        />
+
+        <AdvertiserList
+          v-if="selectedOverview === `advertisers`"
           class="h-full"
         />
 
@@ -46,6 +57,8 @@
 <script>
 
 import PacketList from '@/components/PacketList'
+import ConnectionList from '@/components/ConnectionList'
+import AdvertiserList from '@/components/AdvertiserList'
 import Issues from '@/components/Issues'
 import Header from '../components/Header.vue'
 import PacketDetails from '../components/PacketDetails.vue'
@@ -55,6 +68,8 @@ export default {
   name: 'Home',
   components: {
     PacketList,
+    ConnectionList,
+    AdvertiserList,
     Issues,
     Header,
     PacketDetails,

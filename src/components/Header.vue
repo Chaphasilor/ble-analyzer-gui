@@ -13,10 +13,11 @@
       <button
         class="p-2 text-white bg-lightblue-600"
         type="button"
-        @click="$store.dispatch(`receiveLivePackets`)"
+        @click="$store.dispatch(`receiveLive`)"
       >
         Receive Packets
       </button>
+
       <button
         class="p-2 mr-1 text-white bg-lightblue-600"
         type="button"
@@ -24,6 +25,7 @@
       >
         Load All Packets
       </button>
+
       <button
         class="p-2 mr-1 text-white bg-lightblue-600"
         type="button"
@@ -31,6 +33,15 @@
       >
         Load Connections
       </button>
+
+      <button
+        class="p-2 mr-1 text-white bg-lightblue-600"
+        type="button"
+        @click="$store.dispatch(`loadAllAdvertisers`)"
+      >
+        Load Advertisers
+      </button>
+
       <button
         v-if="$store.getters.packets.length > 0"
         class="p-2 mr-1 text-white bg-orange-400"
@@ -39,6 +50,7 @@
       >
         Clear Packets
       </button>
+
       <button
         v-if="$store.getters.connections.length > 0"
         class="p-2 mr-1 text-white bg-orange-400"
@@ -47,6 +59,16 @@
       >
         Clear Connections
       </button>
+
+      <button
+        v-if="$store.getters.advertisers.length > 0"
+        class="p-2 mr-1 text-white bg-orange-400"
+        type="button"
+        @click="$store.dispatch(`clearAdvertisers`)"
+      >
+        Clear Advertisers
+      </button>
+
       <button
         v-if="$store.getters.packetFilter.length > 0"
         class="p-2 mr-1 text-white bg-orange-400"

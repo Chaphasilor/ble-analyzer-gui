@@ -13,6 +13,7 @@ export default new Vuex.Store({
   state: {
     packets: [],
     connections: [],
+    advertisers: [],
     packetFilter: [],
     selectedPacket: NaN,
   },
@@ -25,6 +26,9 @@ export default new Vuex.Store({
     },
     SET_CONNECTIONS(store, connections) {
       store.connections = connections
+    },
+    SET_ADVERTISERS(store, advertisers) {
+      store.advertisers = advertisers
     },
     SET_PACKET_FILTER(store, filter) {
       store.packetFilter = filter
@@ -39,6 +43,9 @@ export default new Vuex.Store({
     },
     setConnections(context, newConnections) {
       context.commit(`SET_CONNECTIONS`, newConnections)
+    },
+    setAdvertisers(context, newAdvertisers) {
+      context.commit(`SET_ADVERTISERS`, newAdvertisers)
     },
     setPacketFilter(context, filter = []) {
       context.commit(`SET_PACKET_FILTER`, filter)
@@ -58,22 +65,44 @@ export default new Vuex.Store({
       })
       
     },
-    async receiveLivePackets() {
+    async receiveLive() {
 
-      await api.getLivePackets()
+      // await api.getLivePackets()
       await api.getLiveConnections()
+      await api.getLiveAdvertisers()
 
     },
-    loadAllPackets() {
+    loadAllPackets(context) {
 
       api.loadAllPackets()
       .then(() => {
         console.log(`Loaded all packets!`)
+        console.log(`context.getters.packets:`, context.getters.packets)
       })
       .catch(err => {
-
         console.error(`Error while loading all packets:`, err);
+      })
 
+    },
+    loadAllConnections() {
+
+      api.loadAllConnections()
+      .then(() => {
+        console.log(`Loaded all connections!`)
+      })
+      .catch(err => {
+        console.error(`Error while loading all connections:`, err);
+      })
+
+    },
+    loadAllAdvertisers() {
+
+      api.loadAllAdvertisers()
+      .then(() => {
+        console.log(`Loaded all advertisers!`)
+      })
+      .catch(err => {
+        console.error(`Error while loading all advertisers:`, err);
       })
 
     },
@@ -85,6 +114,11 @@ export default new Vuex.Store({
     clearConnections(context) {
 
       context.commit(`SET_CONNECTIONS`, [])
+      
+    },
+    clearAdvertisers(context) {
+
+      context.commit(`SET_ADVERTISERS`, [])
       
     },
     clearPacketFilter(context) {
@@ -99,23 +133,11 @@ export default new Vuex.Store({
       return packet
       
     },
-    loadAllConnections() {
-
-      api.loadAllConnections()
-      .then(() => {
-        console.log(`Loaded all connections!`)
-      })
-      .catch(err => {
-
-        console.error(`Error while loading all connections:`, err);
-
-      })
-
-    },
   },
   getters: {
     packets: (store) => store.packets,
     connections: (store) => store.connections,
+    advertisers: (store) => store.advertisers,
     packetFilter: (store) => store.packetFilter,
     selectedPacket: (store) => store.selectedPacket,
   }

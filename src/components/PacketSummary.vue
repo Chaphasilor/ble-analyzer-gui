@@ -1,9 +1,9 @@
 <template>
   <div
-    class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list"
+    class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list place-items-center"
     :class="source.malformed ? `bg-red-200 hover:bg-red-400` : ``"
     :title="source.malformed ? `This packet is malformed` : ``"
-    @dblclick="$store.dispatch(`selectPacket`, source.packetId); clearSelection();"
+    @dblclick="$store.dispatch(`selectPacket`, source.packetId);"
   >
 
     <span>{{ source.packetId }}</span>
@@ -16,7 +16,7 @@
     >{{ source.type }}</span>
     
     <div
-      class="font-mono"
+      class="px-2 py-px m-1 font-mono rounded-md"
       :style="source.isPartOfConnection ? `background-color: #${accessAddressToColor(source.accessAddress)}; color: ${colorLightOrDark(accessAddressToColor(source.accessAddress)) === `light` ? `black` : `white`}` : ``"
     >
       {{ source.isPartOfConnection ? source.accessAddress : `` }}
@@ -40,7 +40,7 @@
     </div>
 
     <span
-      class="font-mono tracking-tight text-left whitespace-pre-wrap"
+      class="font-mono tracking-tight text-left whitespace-pre-wrap place-self-start"
       style="word-spacing: -0.25rem;"
     >{{
       source.payload.split(``).reduce((string, char, index) => {
@@ -55,6 +55,7 @@
 
 <script>
 export default {
+  name: `PacketSummary`,
   props: {
     index: {
       type: Number,
@@ -86,9 +87,6 @@ export default {
       return luma > 128 ? `light` : `dark`
       
     },
-    clearSelection() {
-      window.getSelection().removeAllRanges()
-    }
   }
 }
 </script>

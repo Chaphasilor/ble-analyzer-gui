@@ -25,11 +25,26 @@ export default {
       default: function() {
         return [`Main`]
       }
+    },
+    onFilterChange: String, 
+  },
+  computed: {
+    packetFilter() {
+      return this.$store.getters.packetFilter
+    }
+  },
+  watch: {
+    packetFilter: {
+      deep: true,
+      handler: function() {
+        this.$emit(`input`, this.onFilterChange)
+      }
     }
   },
   mounted() {
 
     console.log(`this.value:`, this.value)
+    console.log(`this.onFilterChange:`, this.onFilterChange)
     
   }
 }

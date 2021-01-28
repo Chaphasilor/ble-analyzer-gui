@@ -5,13 +5,8 @@
     Show Warnings and Alerts here
     <br>
     <br>
-    Things like missing packets, protocol errors, timeouts, low RSSIs, etc.
+    Things like missing packets, protocol errors, timeouts, etc.
   
-    <br>
-    <br>
-  
-    {{ $store.getters.connections }}
-    
   </div>
 </template>
 
