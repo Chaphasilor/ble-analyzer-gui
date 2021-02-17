@@ -39,6 +39,8 @@
 
     </div>
 
+    <span>{{ source.highestProtocol }}</span>
+
     <span
       class="font-mono tracking-tight text-left whitespace-pre-wrap place-self-start"
       style="word-spacing: -0.25rem;"

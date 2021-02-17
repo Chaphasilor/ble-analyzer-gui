@@ -12,6 +12,7 @@
         <span>RSSI</span>
         <span>Type</span>
         <span>Access Address</span>
+        <span>Highest Proto</span>
         <span>Payload</span>
         <span>Length</span>
       </div>

@@ -57,6 +57,11 @@
         </tr>
 
         <tr>
+          <td>Channel Type</td>
+          <td>{{ packet.isOnPrimaryAdvertisingChannel ? `Primary Advertising` : `Data or Secondary Advertising` }}</td>
+        </tr>
+
+        <tr>
           <td>Type of Packet</td>
           <td>{{ packet.type }}</td>
         </tr>
