@@ -44,11 +44,8 @@
     <span
       class="font-mono tracking-tight text-left whitespace-pre-wrap place-self-start"
       style="word-spacing: -0.25rem;"
-    >{{
-      source.payload.split(``).reduce((string, char, index) => {
-        return `${string}${char.toUpperCase()}${index % 2 === 0 ? `` : ` `}`
-      }, ``)
-    }}</span>
+      v-html="source.isAdvertisement ? highlightAdvertisingAddress(payloadFormatted) : payloadFormatted"
+    ></span>
 
     <span>{{ source.length }}</span>
     
@@ -72,7 +69,12 @@ export default {
   computed: {
     date() {
       return new Date(Math.round(this.source.microseconds/1000))
-    }
+    },
+    payloadFormatted() {
+      return this.source.payload.split(``).reduce((string, char, index) => {
+        return `${string}${char.toUpperCase()}${index % 2 === 0 ? `` : ` `}`
+      }, ``)
+    },
   },
   methods: {
     accessAddressToColor(address) {
@@ -89,6 +91,10 @@ export default {
       return luma > 128 ? `light` : `dark`
       
     },
-  }
+    highlightAdvertisingAddress(payloadString) {
+      let reversedAddress = this.source.advertisingAddress.toUpperCase().split(`:`).reverse().join(` `)
+      return payloadString.replace(reversedAddress, `<b title="Advertising Address: ${this.source.advertisingAddress}" >${reversedAddress}</b>`)
+    }
+  },
 }
 </script>
