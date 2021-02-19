@@ -160,6 +160,18 @@ export default class API {
     )
     
   }
+
+  async getLiveIssues() {
+
+    await this.sendCommand(`issuesLive`,
+      [],
+      (response) => {
+        console.log(`response:`, response);
+        store.dispatch(`setIssues`, response)
+      }
+    )
+    
+  }
   
   loadAllPackets() {
     return new Promise((resolve) => {
@@ -196,6 +208,20 @@ export default class API {
         [],
         (response) => {
           store.dispatch(`setAdvertisers`, response)
+          return resolve()
+        }
+      )
+    
+    })
+  }
+  
+  loadAllIssues() {
+    return new Promise((resolve) => {
+    
+      this.sendCommand(`issues`,
+        [],
+        (response) => {
+          store.dispatch(`setIssues`, response)
           return resolve()
         }
       )

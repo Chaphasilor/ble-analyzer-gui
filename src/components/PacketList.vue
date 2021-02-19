@@ -76,11 +76,19 @@ export default {
       })
       
     },
+    scrollToIndex: function() {
+      return this.$store.getters.scrollToIndex
+    },
   },
   watch: {
     filteredPackets() {
       // scroll list (to top) to force re-rendering 
       this.$refs[`packet-list`].scrollToIndex(0)
+    },
+    scrollToIndex(index) {
+      if (!isNaN(index)) {
+        this.$refs[`packet-list`].scrollToIndex(index)
+      }
     }
   },
   mounted() {

@@ -1,13 +1,13 @@
 <template>
   <div
     class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list place-items-center"
-    :class="source.malformed ? `bg-red-200 hover:bg-red-400` : ``"
+    :class="`${source.malformed ? `bg-red-200 hover:bg-red-400` : ``} ${scrollToIndex === index ? `bg-orange-300` : ``}`"
     :title="source.malformed ? `This packet is malformed` : ``"
     @dblclick="$store.dispatch(`selectPacket`, source.packetId);"
   >
 
     <span>{{ source.packetId }}</span>
-    <span>{{ `${String(date.getHours()).padStart(2, `0`)}:${String(date.getMinutes()).padStart(2, `0`)}:${String(date.getSeconds()).padStart(2, `0`)}.${String(date.getMilliseconds()).padEnd(3, `0`)}${String(source.microseconds).slice(-3).padEnd(3, `0`)}` }}</span>
+    <span>{{ generateTimestamp(source.microseconds) }}</span>
     
     <span>{{ source.channel }}</span>
     <span>{{ source.rssi }}</span>
@@ -67,18 +67,24 @@ export default {
     }
   },
   computed: {
-    date() {
-      return new Date(Math.round(this.source.microseconds/1000))
-    },
     payloadFormatted() {
       return this.source.payload.split(``).reduce((string, char, index) => {
         return `${string}${char.toUpperCase()}${index % 2 === 0 ? `` : ` `}`
       }, ``)
     },
+    scrollToIndex: function() {
+      return this.$store.getters.scrollToIndex
+    },
   },
   methods: {
     accessAddressToColor(address) {
       return address.slice(4)
+    },
+    generateTimestamp(microseconds) {
+
+      let timestampDate = new Date(Math.round(microseconds/1000))
+      return `${String(timestampDate.getHours()).padStart(2, `0`)}:${String(timestampDate.getMinutes()).padStart(2, `0`)}:${String(timestampDate.getSeconds()).padStart(2, `0`)}.${String(timestampDate.getMilliseconds()).padEnd(3, `0`)}${String(microseconds).slice(-3).padEnd(3, `0`)}`
+      
     },
     colorLightOrDark(color) {
 
@@ -94,7 +100,7 @@ export default {
     highlightAdvertisingAddress(payloadString) {
       let reversedAddress = this.source.advertisingAddress.toUpperCase().split(`:`).reverse().join(` `)
       return payloadString.replace(reversedAddress, `<b title="Advertising Address: ${this.source.advertisingAddress}" >${reversedAddress}</b>`)
-    }
+    },
   },
 }
 </script>

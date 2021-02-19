@@ -14,8 +14,10 @@ export default new Vuex.Store({
     packets: [],
     connections: [],
     advertisers: [],
+    issues: [],
     packetFilter: [],
     selectedPacket: NaN,
+    scrollToIndex: NaN,
   },
   mutations: {
     SET_PACKETS(store, packets) {
@@ -30,11 +32,17 @@ export default new Vuex.Store({
     SET_ADVERTISERS(store, advertisers) {
       store.advertisers = advertisers
     },
+    SET_ISSUES(store, issues) {
+      store.issues = issues
+    },
     SET_PACKET_FILTER(store, filter) {
       store.packetFilter = filter
     },
     SET_SELECTED_PACKET(store, packetId) {
       store.selectedPacket = packetId
+    },
+    SET_SCROLL_TO_INDEX(store, index) {
+      store.scrollToIndex = index
     },
 },
   actions: {
@@ -47,12 +55,20 @@ export default new Vuex.Store({
     setAdvertisers(context, newAdvertisers) {
       context.commit(`SET_ADVERTISERS`, newAdvertisers)
     },
+    setIssues(context, newIssues) {
+      context.commit(`SET_ISSUES`, newIssues)
+    },
     setPacketFilter(context, filter = []) {
       context.commit(`SET_PACKET_FILTER`, filter)
     },
     selectPacket(context, packetId) {
       context.commit(`SET_SELECTED_PACKET`, packetId)
       console.log(`packetId:`, packetId)
+    },
+    scrollToIndex(context, index) {
+      context.commit(`SET_SCROLL_TO_INDEX`, index)
+      console.log(`index:`, index)
+      setTimeout(() => context.commit(`SET_SCROLL_TO_INDEX`, NaN), 500)
     },
     connectToServer() {
 
@@ -70,6 +86,7 @@ export default new Vuex.Store({
       // await api.getLivePackets()
       await api.getLiveConnections()
       await api.getLiveAdvertisers()
+      await api.getLiveIssues()
 
     },
     loadAllPackets(context) {
@@ -106,6 +123,17 @@ export default new Vuex.Store({
       })
 
     },
+    loadAllIssues() {
+
+      api.loadAllIssues()
+      .then(() => {
+        console.log(`Loaded all issues!`)
+      })
+      .catch(err => {
+        console.error(`Error while loading all issues:`, err);
+      })
+
+    },
     clearPackets(context) {
 
       context.commit(`SET_PACKETS`, [])
@@ -119,6 +147,11 @@ export default new Vuex.Store({
     clearAdvertisers(context) {
 
       context.commit(`SET_ADVERTISERS`, [])
+      
+    },
+    clearIssues(context) {
+
+      context.commit(`SET_ISSUES`, [])
       
     },
     clearPacketFilter(context) {
@@ -138,7 +171,9 @@ export default new Vuex.Store({
     packets: (store) => store.packets,
     connections: (store) => store.connections,
     advertisers: (store) => store.advertisers,
+    issues: (store) => store.issues,
     packetFilter: (store) => store.packetFilter,
     selectedPacket: (store) => store.selectedPacket,
+    scrollToIndex: (store) => store.scrollToIndex,
   }
 })

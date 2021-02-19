@@ -43,6 +43,14 @@
       </button>
 
       <button
+        class="p-2 mr-1 text-white bg-lightblue-600"
+        type="button"
+        @click="$store.dispatch(`loadAllIssues`)"
+      >
+        Load Issues
+      </button>
+
+      <button
         v-if="$store.getters.packets.length > 0"
         class="p-2 mr-1 text-white bg-orange-400"
         type="button"
@@ -67,6 +75,15 @@
         @click="$store.dispatch(`clearAdvertisers`)"
       >
         Clear Advertisers
+      </button>
+
+      <button
+        v-if="$store.getters.issues.length > 0"
+        class="p-2 mr-1 text-white bg-orange-400"
+        type="button"
+        @click="$store.dispatch(`clearIssues`)"
+      >
+        Clear Issues
       </button>
 
       <button

@@ -20,7 +20,7 @@ module.exports = {
         'main': `3rem minmax(0, 1fr)`,
         'left': `2rem minmax(0, 3fr) 1fr`,
         // Simple 8 row grid
-        'layout': '2.5rem minmax(10rem, 1fr) 16rem',
+        'layout': '2.5rem minmax(10rem, 1fr) minmax(0, 16rem)',
       },
       gridTemplateColumns: {
         'main': `2fr 1fr`,

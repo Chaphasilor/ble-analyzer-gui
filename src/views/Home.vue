@@ -8,7 +8,7 @@
     />
 
     <div
-      :class="`grid m-0 h-full grid-rows-left ${detailsOpen ? `col-span-auto` : `col-span-full`}`"
+      :class="`grid m-0 h-full grid-rows-layout ${detailsOpen ? `col-span-auto` : `col-span-full`}`"
     >
 
       <OverviewSwitcher
@@ -40,7 +40,7 @@
       </div>
 
       <Issues
-        class="text-xl border-t border-gray-500"
+        class="border-t border-gray-500"
       />
 
     </div>
