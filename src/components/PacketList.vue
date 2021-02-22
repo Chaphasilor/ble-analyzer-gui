@@ -24,6 +24,7 @@
       :data-sources="filteredPackets"
       :data-component="PacketSummaryComponent"
       :keeps="50"
+      @resized="onItemRendered"
     />
     
   </div>
@@ -89,6 +90,11 @@ export default {
       if (!isNaN(index)) {
         this.$refs[`packet-list`].scrollToIndex(index)
       }
+    }
+  },
+  methods: {
+    onItemRendered() {
+      // this.$refs[`packet-list`].scrollToBottom()
     }
   },
   mounted() {

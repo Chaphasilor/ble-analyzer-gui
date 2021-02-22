@@ -28,13 +28,18 @@ export default class API {
   connectToServer() {
     return new Promise((resolve, reject) => {
 
+      console.info(`Connecting to websocket at ${this.url}`)
       this.socket = new WebSocket(this.url)
   
       this.socket.onopen = () => {
         if (this.socket.readyState === WebSocket.OPEN) {
 
           console.log(`Socket opened!`)
-          return resolve()
+          
+          this.socket.onmessage = (message) => {
+            this.connectionId = JSON.parse(message.data)
+            return resolve()
+          }
 
         } 
       }

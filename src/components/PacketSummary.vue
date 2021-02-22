@@ -41,8 +41,9 @@
 
     <span>{{ source.highestProtocol }}</span>
 
+      <!-- :class="detailsViewOpen ? `whitespace-nowrap` : `whitespace-pre-wrap`" -->
     <span
-      class="font-mono tracking-tight text-left whitespace-pre-wrap place-self-start"
+      class="w-full overflow-x-auto font-mono tracking-tight text-left whitespace-nowrap place-self-start"
       style="word-spacing: -0.25rem;"
       v-html="source.isAdvertisement ? highlightAdvertisingAddress(payloadFormatted) : payloadFormatted"
     ></span>
@@ -71,6 +72,9 @@ export default {
       return this.source.payload.split(``).reduce((string, char, index) => {
         return `${string}${char.toUpperCase()}${index % 2 === 0 ? `` : ` `}`
       }, ``)
+    },
+    detailsViewOpen() {
+      return !isNaN(this.$store.getters.selectedPacket)
     },
     scrollToIndex: function() {
       return this.$store.getters.scrollToIndex

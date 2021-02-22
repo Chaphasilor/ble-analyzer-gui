@@ -1,6 +1,6 @@
 <template>
   <div
-    class="overflow-x-auto"
+    class="flex flex-col h-full"
   >
 
     <h2
@@ -10,15 +10,21 @@
     </h2>
 
     <div
-      class="p-1 my-1 border-b border-gray-500"
-      v-for="(issue, index) of issues"
-      :key="index"
-      @dblclick="$store.dispatch(`scrollToIndex`, getClosestPacket(issue.microseconds) - 1);"
+      class="h-full overflow-x-auto"
     >
-      At {{ generateTimestamp(issue.microseconds) }}:
-      <span
-        :class="`px-1 ${issue.type === `warning` ? `bg-orange-400` : `bg-red-600 text-white`}`"
-      >{{ issue.message }}</span>
+
+      <div
+        class="p-1 my-1 border-b border-gray-500 cursor-pointer"
+        v-for="(issue, index) of issues"
+        :key="index"
+        @click="$store.dispatch(`scrollToIndex`, getClosestPacket(issue.microseconds) - 1);"
+      >
+        At {{ generateTimestamp(issue.microseconds) }}:
+        <span
+          :class="`px-1 ${issue.type === `warning` ? `bg-orange-400` : `bg-red-600 text-white`}`"
+        >{{ issue.message }}</span>
+      </div>
+
     </div>
 
     <span

@@ -4,7 +4,7 @@ import API from '@/assets/js/api'
 
 Vue.use(Vuex)
 
-const websocketUrl = `ws://127.0.0.1`
+const websocketUrl = `ws://127.0.0.1:70`
 let api = new API(websocketUrl)
 
 export default new Vuex.Store({
@@ -83,7 +83,7 @@ export default new Vuex.Store({
     },
     async receiveLive() {
 
-      // await api.getLivePackets()
+      await api.getLivePackets()
       await api.getLiveConnections()
       await api.getLiveAdvertisers()
       await api.getLiveIssues()
