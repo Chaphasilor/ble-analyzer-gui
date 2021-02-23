@@ -23,8 +23,9 @@
       :data-key="'packetId'"
       :data-sources="filteredPackets"
       :data-component="PacketSummaryComponent"
-      :keeps="50"
-      @resized="onItemRendered"
+      :keeps="40"
+      @scroll="scrollHandler"
+      @tobottom="toBottomHandler"
     />
     
   </div>
@@ -43,6 +44,7 @@ export default {
   data() {
     return {
       PacketSummaryComponent: PacketSummary,
+      userHasScrolled: false,
     }
   },
   computed: {
@@ -90,11 +92,20 @@ export default {
       if (!isNaN(index)) {
         this.$refs[`packet-list`].scrollToIndex(index)
       }
+    },
+    packets() {
+      // list won't stay scrolled if packets are updated :/
+      // if (!this.userHasScrolled) { 
+        this.$refs[`packet-list`].scrollToBottom()
+      // }
     }
   },
   methods: {
-    onItemRendered() {
-      // this.$refs[`packet-list`].scrollToBottom()
+    scrollHandler() {
+      this.userHasScrolled = true
+    },
+    toBottomHandler() {
+      this.userHasScrolled = false
     }
   },
   mounted() {

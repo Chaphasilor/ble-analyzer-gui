@@ -83,10 +83,12 @@ export default new Vuex.Store({
     },
     async receiveLive() {
 
-      await api.getLivePackets()
-      await api.getLiveConnections()
-      await api.getLiveAdvertisers()
-      await api.getLiveIssues()
+      await api.connectToServer()
+      
+      api.getLivePackets()
+      api.getLiveConnections()
+      api.getLiveAdvertisers()
+      api.getLiveIssues()
 
     },
     loadAllPackets(context) {

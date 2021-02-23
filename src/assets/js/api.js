@@ -101,7 +101,7 @@ export default class API {
 
       let parsed = this.parseMessage(message)
 
-      console.log(`parsed:`, parsed);
+      // console.log(`parsed:`, parsed);
   
       let command = this.activeCommands.find(x => x.name === parsed.value[0])
   
@@ -132,10 +132,12 @@ export default class API {
   
   async getLivePackets() {
 
+    console.log(`Now listening for live packets`)
+
     await this.sendCommand(`live`,
       [],
       (response) => {
-        console.log(`response:`, response);
+        console.log(`New live packets:`, response);
         store.dispatch(`addPackets`, response)
       }
     )
@@ -147,7 +149,7 @@ export default class API {
     await this.sendCommand(`connectionsLive`,
       [],
       (response) => {
-        console.log(`response:`, response);
+        console.log(`New live connections:`, response);
         store.dispatch(`setConnections`, response)
       }
     )
@@ -159,7 +161,7 @@ export default class API {
     await this.sendCommand(`advertisersLive`,
       [],
       (response) => {
-        console.log(`response:`, response);
+        console.log(`New live Advertisers:`, response);
         store.dispatch(`setAdvertisers`, response)
       }
     )
@@ -171,7 +173,7 @@ export default class API {
     await this.sendCommand(`issuesLive`,
       [],
       (response) => {
-        console.log(`response:`, response);
+        console.log(`New live Issues:`, response);
         store.dispatch(`setIssues`, response)
       }
     )
