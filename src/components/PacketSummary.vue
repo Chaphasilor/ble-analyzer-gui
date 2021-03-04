@@ -1,8 +1,8 @@
 <template>
   <div
     class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list place-items-center"
-    :class="`${source.malformed ? `bg-red-200 hover:bg-red-400` : ``} ${scrollToIndex === index ? `bg-orange-300` : ``}`"
-    :title="source.malformed ? `This packet is malformed` : ``"
+    :class="`${(source.malformed || !source.crcOk) ? `bg-red-300 hover:bg-red-400` : ``} ${scrollToIndex === index ? `bg-orange-300` : ``}`"
+    :title="source.malformed ? `This packet is malformed` : !source.crcOk ? `The packet's CRC isn't correct` : ``"
     @dblclick="$store.dispatch(`selectPacket`, source.packetId);"
   >
 
@@ -49,6 +49,8 @@
     ></span>
 
     <span>{{ source.length }}</span>
+
+    <span>{{ source.crcOk ? `OK` : `WRONG` }}</span>
     
   </div>
 </template>

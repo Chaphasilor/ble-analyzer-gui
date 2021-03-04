@@ -1,21 +1,22 @@
 <template>
   <div
-    class="flex flex-col"
+    class="relative flex flex-col"
   >
 
-      <div
-        class="grid content-center grid-flow-row grid-rows-1 gap-1 pr-4 text-center border-b-2 border-gray-700 grid-cols-packet-list"
-      >
-        <span>ID</span>
-        <span>Time of Arrival</span>
-        <span>Channel</span>
-        <span>RSSI</span>
-        <span>Type</span>
-        <span>Access Address</span>
-        <span>Highest Proto</span>
-        <span>Payload</span>
-        <span>Length</span>
-      </div>
+    <div
+      class="grid content-center grid-flow-row grid-rows-1 gap-1 pr-4 text-center border-b-2 border-gray-700 grid-cols-packet-list"
+    >
+      <span>ID</span>
+      <span>Time of Arrival</span>
+      <span>Channel</span>
+      <span>RSSI</span>
+      <span>Type</span>
+      <span>Access Address</span>
+      <span>Highest Proto</span>
+      <span>Payload</span>
+      <span>Length</span>
+      <span>CRC</span>
+    </div>
       
     <VirtualList
       ref="packet-list"
@@ -27,6 +28,15 @@
       @scroll="scrollHandler"
       @tobottom="toBottomHandler"
     />
+
+    <div
+      class="absolute grid w-full h-full place-content-center"
+      v-if="filteredPackets.length === 0"
+    >
+      <span
+        class=""
+      >No packets loaded</span>
+    </div>
     
   </div>
 </template>
@@ -54,14 +64,15 @@ export default {
     filteredPackets: function() {
 
       let filter = this.$store.getters.packetFilter
-      
+      let filteredPackets = []
+
       if (filter.length === 0) {
-        return this.packets
+        filteredPackets = this.packets
       }
 
       console.log(`filter:`, filter)
 
-      return this.packets.filter(packet => {
+      filteredPackets = this.packets.filter(packet => {
         return filter.every(([key, value]) => {
 
           let base = packet
@@ -77,6 +88,8 @@ export default {
           
         })
       })
+
+      return filteredPackets.sort((a, b) => a.packetId > b.packetId ? 1 : -1) // sort by packetId (ascending)
       
     },
     scrollToIndex: function() {

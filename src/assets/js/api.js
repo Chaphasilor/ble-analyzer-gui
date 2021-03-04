@@ -42,12 +42,23 @@ export default class API {
           }
 
         } 
+
+        this.socket.onclose = (event) => {
+
+          alert(`Lost connection to server! (Code: '${event.code}', Reason: '${event.reason}')`)
+          
+        }
+        
       }
 
       this.socket.onerror = (error) => {
         return reject(error)
       }
-    
+
+      this.socket.onclose = () => {
+        alert(`Can't connect to server!`)
+      }
+
     })
   }
 
@@ -173,7 +184,7 @@ export default class API {
     await this.sendCommand(`issuesLive`,
       [],
       (response) => {
-        console.log(`New live Issues:`, response);
+        // console.log(`New live Issues:`, response);
         store.dispatch(`setIssues`, response)
       }
     )
