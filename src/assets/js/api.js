@@ -148,8 +148,19 @@ export default class API {
     await this.sendCommand(`live`,
       [],
       (response) => {
-        console.log(`New live packets:`, response);
+        // console.log(`New live packets:`, response);
         store.dispatch(`addPackets`, response)
+      }
+    )
+    
+  }
+
+  async endLivePackets() {
+
+    await this.sendCommand(`end`,
+      [`live`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
       }
     )
     
@@ -160,8 +171,19 @@ export default class API {
     await this.sendCommand(`connectionsLive`,
       [],
       (response) => {
-        console.log(`New live connections:`, response);
+        // console.log(`New live connections:`, response)
         store.dispatch(`setConnections`, response)
+      }
+    )
+    
+  }
+
+  async endLiveConnections() {
+
+    await this.sendCommand(`end`,
+      [`connectionsLive`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
       }
     )
     
@@ -172,8 +194,19 @@ export default class API {
     await this.sendCommand(`advertisersLive`,
       [],
       (response) => {
-        console.log(`New live Advertisers:`, response);
+        // console.log(`New live Advertisers:`, response);
         store.dispatch(`setAdvertisers`, response)
+      }
+    )
+    
+  }
+
+  async endLiveAdvertisers() {
+
+    await this.sendCommand(`end`,
+      [`advertisersLive`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
       }
     )
     
@@ -186,6 +219,17 @@ export default class API {
       (response) => {
         // console.log(`New live Issues:`, response);
         store.dispatch(`setIssues`, response)
+      }
+    )
+    
+  }
+
+  async endLiveIssues() {
+
+    await this.sendCommand(`end`,
+      [`issuesLive`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
       }
     )
     

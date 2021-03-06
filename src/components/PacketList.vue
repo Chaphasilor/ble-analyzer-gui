@@ -70,8 +70,6 @@ export default {
         filteredPackets = this.packets
       }
 
-      console.log(`filter:`, filter)
-
       filteredPackets = this.packets.filter(packet => {
         return filter.every(([key, value]) => {
 
@@ -92,8 +90,8 @@ export default {
       return filteredPackets.sort((a, b) => a.packetId > b.packetId ? 1 : -1) // sort by packetId (ascending)
       
     },
-    scrollToIndex: function() {
-      return this.$store.getters.scrollToIndex
+    scrollToId: function() {
+      return this.$store.getters.scrollToId
     },
   },
   watch: {
@@ -101,9 +99,9 @@ export default {
       // scroll list (to top) to force re-rendering 
       this.$refs[`packet-list`].scrollToIndex(0)
     },
-    scrollToIndex(index) {
-      if (!isNaN(index)) {
-        this.$refs[`packet-list`].scrollToIndex(index)
+    scrollToId(id) {
+      if (!isNaN(id)) {
+        this.$refs[`packet-list`].scrollToIndex(id)
       }
     },
     packets() {

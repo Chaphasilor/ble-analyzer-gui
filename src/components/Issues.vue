@@ -17,7 +17,7 @@
         class="p-1 my-1 border-b border-gray-500 cursor-pointer"
         v-for="(issue, index) of issues"
         :key="index"
-        @click="$store.dispatch(`scrollToIndex`, getClosestPacket(issue.microseconds) - 1);"
+        @click="$store.dispatch(`scrollToId`, getClosestPacket(issue.microseconds) - 1);"
       >
         At {{ generateTimestamp(issue.microseconds) }}:
         <span

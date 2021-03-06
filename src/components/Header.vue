@@ -15,10 +15,18 @@
         type="button"
         @click="$store.dispatch(`receiveLive`)"
       >
-        Receive Packets
+        Receive Live Packets
       </button>
 
       <button
+        class="p-2 mr-1 text-white bg-lightblue-600"
+        type="button"
+        @click="$store.dispatch(`loadEverything`)"
+      >
+        Load Packets
+      </button>
+
+      <!-- <button
         class="p-2 mr-1 text-white bg-lightblue-600"
         type="button"
         @click="$store.dispatch(`loadAllPackets`)"
@@ -48,9 +56,18 @@
         @click="$store.dispatch(`loadAllIssues`)"
       >
         Load Issues
-      </button>
+      </button> -->
 
       <button
+        v-if="$store.getters.packets.length > 0"
+        class="p-2 mr-1 text-white bg-orange-400"
+        type="button"
+        @click="$store.dispatch(`clearEverything`)"
+      >
+        Clear Packets
+      </button>
+
+      <!-- <button
         v-if="$store.getters.packets.length > 0"
         class="p-2 mr-1 text-white bg-orange-400"
         type="button"
@@ -84,7 +101,7 @@
         @click="$store.dispatch(`clearIssues`)"
       >
         Clear Issues
-      </button>
+      </button> -->
 
       <button
         v-if="$store.getters.packetFilter.length > 0"
@@ -93,6 +110,15 @@
         @click="$store.dispatch(`clearPacketFilter`)"
       >
         Clear Filter
+      </button>
+
+      <button
+        v-if="$store.getters.liveActive"
+        class="p-2 mr-1 text-white bg-orange-400"
+        type="button"
+        @click="$store.dispatch(`stopLive`)"
+      >
+        Stop Receiving Packets
       </button>
       
     </div>

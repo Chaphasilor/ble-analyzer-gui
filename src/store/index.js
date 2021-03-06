@@ -17,7 +17,8 @@ export default new Vuex.Store({
     issues: [],
     packetFilter: [],
     selectedPacket: NaN,
-    scrollToIndex: NaN,
+    scrollToId: NaN,
+    liveActive: false,
   },
   mutations: {
     SET_PACKETS(store, packets) {
@@ -41,8 +42,11 @@ export default new Vuex.Store({
     SET_SELECTED_PACKET(store, packetId) {
       store.selectedPacket = packetId
     },
-    SET_SCROLL_TO_INDEX(store, index) {
-      store.scrollToIndex = index
+    SET_SCROLL_TO_ID(store, id) {
+      store.scrollToId = id
+    },
+    SET_LIVE_ACTIVE(store, state) {
+      store.liveActive = state
     },
 },
   actions: {
@@ -65,10 +69,11 @@ export default new Vuex.Store({
       context.commit(`SET_SELECTED_PACKET`, packetId)
       console.log(`packetId:`, packetId)
     },
-    scrollToIndex(context, index) {
-      context.commit(`SET_SCROLL_TO_INDEX`, index)
-      console.log(`index:`, index)
-      setTimeout(() => context.commit(`SET_SCROLL_TO_INDEX`, NaN), 500)
+    scrollToId(context, id) {
+      if (context.getters.packets.find(x => x.packetId === id))
+      context.commit(`SET_SCROLL_TO_ID`, id)
+      console.log(`index:`, id)
+      setTimeout(() => context.commit(`SET_SCROLL_TO_ID`, NaN), 500)
     },
     connectToServer() {
 
@@ -81,15 +86,57 @@ export default new Vuex.Store({
       })
       
     },
-    async receiveLive() {
+    async receiveLive(context) {
 
       await api.connectToServer()
       
-      api.getLivePackets()
-      api.getLiveConnections()
-      api.getLiveAdvertisers()
-      api.getLiveIssues()
+      try {
+        await Promise.all([
+          api.getLivePackets(),
+          api.getLiveConnections(),
+          api.getLiveAdvertisers(),
+          api.getLiveIssues(),
+        ])
 
+        context.commit(`SET_LIVE_ACTIVE`, true)
+
+      } catch (err) {
+        console.error(`Failed to subscribe to some live commands:`, err)
+        alert(`Couldn't start some live commands! Please try again.`)
+        context.dispatch(`stopLive`)
+      }
+
+    },
+    async stopLive(context) {
+
+      try {
+        await Promise.all([
+          api.endLivePackets(),
+          api.endLiveConnections(),
+          api.endLiveAdvertisers(),
+          api.endLiveIssues(),
+        ])
+  
+        context.commit(`SET_LIVE_ACTIVE`, false)
+      } catch (err) {
+        console.error(`Failed to unsubscribe to from live commands:`, err)
+        alert(`Couldn't stop some live commands! Please reload the page.`)
+      }
+
+    },
+    async loadEverything() {
+      try {
+
+        await api.loadAllPackets()
+        await api.loadAllConnections()
+        await api.loadAllAdvertisers()
+        await api.loadAllIssues()
+
+        console.info(`Loaded everything!`)
+
+      } catch (err) {
+        console.error(`Error loading everything:`, err)
+      }
     },
     loadAllPackets(context) {
 
@@ -136,30 +183,28 @@ export default new Vuex.Store({
       })
 
     },
-    clearPackets(context) {
+    clearEverything(context) {
 
       context.commit(`SET_PACKETS`, [])
-      
-    },
-    clearConnections(context) {
-
       context.commit(`SET_CONNECTIONS`, [])
-      
-    },
-    clearAdvertisers(context) {
-
       context.commit(`SET_ADVERTISERS`, [])
-      
-    },
-    clearIssues(context) {
-
       context.commit(`SET_ISSUES`, [])
       
     },
+    clearPackets(context) {
+      context.commit(`SET_PACKETS`, [])
+    },
+    clearConnections(context) {
+      context.commit(`SET_CONNECTIONS`, [])
+    },
+    clearAdvertisers(context) {
+      context.commit(`SET_ADVERTISERS`, [])
+    },
+    clearIssues(context) {
+      context.commit(`SET_ISSUES`, [])
+    },
     clearPacketFilter(context) {
-
       context.commit(`SET_PACKET_FILTER`, [])
-      
     },
     async loadPacket(context, packetId) {
 
@@ -176,6 +221,7 @@ export default new Vuex.Store({
     issues: (store) => store.issues,
     packetFilter: (store) => store.packetFilter,
     selectedPacket: (store) => store.selectedPacket,
-    scrollToIndex: (store) => store.scrollToIndex,
+    scrollToId: (store) => store.scrollToId,
+    liveActive: (store) => store.liveActive,
   }
 })
