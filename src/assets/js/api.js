@@ -117,7 +117,7 @@ export default class API {
       let command = this.activeCommands.find(x => x.name === parsed.value[0])
   
       if (!command) {
-        throw new Error(`Command not found: ${command}`)
+        console.warn(`Command not found: ${parsed.value[0]}`)
       }
   
       switch (parsed.type) {
@@ -161,6 +161,7 @@ export default class API {
       [`live`],
       (response) => {
         console.info(`Unsubscribed successfully:`, response);
+        this.activeCommands = this.activeCommands.filter(x => x !== `live`)
       }
     )
     
@@ -184,6 +185,7 @@ export default class API {
       [`connectionsLive`],
       (response) => {
         console.info(`Unsubscribed successfully:`, response);
+        this.activeCommands = this.activeCommands.filter(x => x !== `connection`)
       }
     )
     
@@ -207,6 +209,7 @@ export default class API {
       [`advertisersLive`],
       (response) => {
         console.info(`Unsubscribed successfully:`, response);
+        this.activeCommands = this.activeCommands.filter(x => x !== `advertiser`)
       }
     )
     
@@ -230,6 +233,7 @@ export default class API {
       [`issuesLive`],
       (response) => {
         console.info(`Unsubscribed successfully:`, response);
+        this.activeCommands = this.activeCommands.filter(x => x !== `issuesLive`)
       }
     )
     
