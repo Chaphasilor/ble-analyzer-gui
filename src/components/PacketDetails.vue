@@ -67,6 +67,11 @@
         </tr>
         
         <tr>
+          <td>Direction</td>
+          <td>{{ packet.direction === `S2M` ? `Slave to Master` : `Master to Slave` }}</td>
+        </tr>
+        
+        <tr>
           <td>Source Device Address</td>
           <td>{{ packet.source }}</td>
         </tr>

@@ -27,9 +27,12 @@
 
     </div>
 
-    <span
+    <div
       v-if="issues.length === 0"
-    >No issues yet</span>
+      class="w-full h-full text-center"
+    >
+      No issues yet
+    </div>
   
   </div>
 </template>

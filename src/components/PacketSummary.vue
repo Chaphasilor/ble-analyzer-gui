@@ -10,7 +10,7 @@
     <span>{{ generateTimestamp(source.microseconds) }}</span>
     
     <span>{{ source.channel }}</span>
-    <span>{{ source.rssi }}</span>
+    <span>{{ source.rssi }} dBm</span>
     <span
       class="font-mono"
     >{{ source.type }}</span>
@@ -50,7 +50,7 @@
 
     <span>{{ source.length }}</span>
 
-    <span>{{ source.crcOk ? `OK` : `WRONG` }}</span>
+    <span>{{ source.crcOk ? `OK` : `BAD` }}</span>
     
   </div>
 </template>
