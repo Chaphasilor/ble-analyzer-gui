@@ -185,6 +185,7 @@ export default new Vuex.Store({
     },
     clearEverything(context) {
 
+      context.commit(`SET_SELECTED_PACKET`, NaN)
       context.commit(`SET_PACKETS`, [])
       context.commit(`SET_CONNECTIONS`, [])
       context.commit(`SET_ADVERTISERS`, [])

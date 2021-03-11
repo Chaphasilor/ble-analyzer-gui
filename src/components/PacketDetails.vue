@@ -32,9 +32,22 @@
 
       <div
         v-if="packet.malformed"
-        class="inline-block p-2 mb-4 text-white bg-red-600"
+        class="w-full p-2 mb-4 text-center text-white bg-red-600"
       >
-        The Package is malformed. Below information might be incorrect!
+        The packet seems to be malformed. The information below might be incorrect!
+      </div>
+
+      <div
+        v-if="!packet.crcOk"
+        class="w-full p-2 mb-4 text-center text-white bg-orange-600"
+      >
+        The packet's CRC (checksum) seems to be bad.
+        <br>
+        <span
+          class="font-mono"
+        >CRC is {{ 
+          packet.protocols.find(proto => proto.shortName === `btle`) ? packet.protocols.find(proto => proto.shortName === `btle`).crc : `unknown`
+         }}</span>
       </div>
 
       <h2>
@@ -52,13 +65,13 @@
         </tr>
 
         <tr>
-          <td>Channel Number</td>
-          <td>{{ packet.channel }}</td>
+          <td>RSSI</td>
+          <td>{{ packet.rssi }} dBm</td>
         </tr>
 
         <tr>
-          <td>Channel Type</td>
-          <td>{{ packet.isOnPrimaryAdvertisingChannel ? `Primary Advertising` : `Data or Secondary Advertising` }}</td>
+          <td>Channel Number</td>
+          <td>{{ packet.channel }} ({{ packet.isOnPrimaryAdvertisingChannel ? `primary advertising` : `data or secondary advertising` }})</td>
         </tr>
 
         <tr>
@@ -73,27 +86,57 @@
         
         <tr>
           <td>Source Device Address</td>
-          <td>{{ packet.source }}</td>
+          <td class="font-mono">{{ packet.source }}</td>
         </tr>
 
         <tr
           v-if="packet.destination !== ``"
         >
           <td>Destination Device Address</td>
-          <td>{{ packet.destination }}</td>
-        </tr>
-
-        <tr>
-          <td>Protocols Used</td>
-          <td>{{ packet.protocols.map(protocol => protocol.name).join(`, `) }}</td>
+          <td class="font-mono">{{ packet.destination }}</td>
         </tr>
 
         <tr>
           <td>Frame length</td>
-          <td>{{ packet.length }} byte</td>
+          <td>{{ packet.length }} bytes</td>
         </tr>
 
       </table>
+
+      <div
+        v-if="packet.advertisingData.length > 0"
+        class="mb-6"
+      >
+
+        <h3>{{ packet.isPrimaryAdvertisement ? `Advertising Data` : `Scan Response Advertising Data` }}</h3>
+
+        <table
+          class="border border-gray-500"
+        >
+
+          <tr
+            class="border-b border-gray-500"
+          >
+            <th>Type</th>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Length</th>
+          </tr>
+
+          <tr
+            class=""
+            v-for="(entry, index) of packet.advertisingData"
+            :key="index"
+          >
+            <td class="p-2 font-mono text-center border border-gray-500">{{ entry.type }}</td>
+            <td class="p-2 text-center border border-gray-500">{{ entry.name }}</td>
+            <td class="p-2 font-mono text-center border border-gray-500">{{ entry.value }}</td>
+            <td class="p-2 text-center border border-gray-500">{{ entry.length }}</td>
+          </tr>
+          
+        </table>
+
+      </div>
 
       <h2>
         Protocols

@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list place-items-center"
-    :class="`${(source.malformed || !source.crcOk) ? `bg-red-300 hover:bg-red-400` : ``} ${scrollToIndex === index ? `bg-orange-300` : ``}`"
+    :class="`${(source.malformed || !source.crcOk) ? `bg-red-300 hover:bg-red-400` : ``} ${scrollToId === index ? `bg-orange-300` : ``}`"
     :title="source.malformed ? `This packet is malformed` : !source.crcOk ? `The packet's CRC isn't correct` : ``"
     @dblclick="$store.dispatch(`selectPacket`, source.packetId);"
   >
@@ -41,9 +41,9 @@
 
     <span>{{ source.highestProtocol }}</span>
 
-      <!-- :class="detailsViewOpen ? `whitespace-nowrap` : `whitespace-pre-wrap`" -->
+    <!-- force scroll bar so all packet summaries have the same height, else there are issues with scrolling to the right offset -->
     <span
-      class="w-full overflow-x-auto font-mono tracking-tight text-left whitespace-nowrap place-self-start"
+      class="w-full overflow-x-scroll font-mono tracking-tight text-left whitespace-nowrap place-self-start"
       style="word-spacing: -0.25rem;"
       v-html="source.isAdvertisement ? highlightAdvertisingAddress(payloadFormatted) : payloadFormatted"
     ></span>
@@ -78,8 +78,8 @@ export default {
     detailsViewOpen() {
       return !isNaN(this.$store.getters.selectedPacket)
     },
-    scrollToIndex: function() {
-      return this.$store.getters.scrollToIndex
+    scrollToId: function() {
+      return this.$store.getters.scrollToId
     },
   },
   methods: {

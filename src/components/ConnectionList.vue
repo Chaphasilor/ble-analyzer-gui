@@ -4,13 +4,14 @@
   >
 
       <div
-        class="grid content-center grid-flow-row grid-rows-1 gap-1 pr-4 text-center border-b-2 border-gray-700 grid-cols-connection-list"
+        class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b-2 border-gray-700 grid-cols-connection-list"
       >
         <span>Color</span>
         <span>Access Address</span>
         <span>Master</span>
         <span>Slave</span>
         <span>Total Packets</span>
+        <span>Status</span>
       </div>
       
     <VirtualList

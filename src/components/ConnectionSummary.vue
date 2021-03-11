@@ -11,7 +11,7 @@
     >
 
       <div
-        class="w-16 h-8 rounded-md"
+        class="w-16 h-8 rounded-md "
         :style="`background-color: #${accessAddressToColor(source.accessAddress)}; color: ${colorLightOrDark(accessAddressToColor(source.accessAddress)) === `light` ? `black` : `white`}`"
       ></div>
 
@@ -24,6 +24,7 @@
     <span>{{ source.master }}</span>
     <span>{{ source.slave }}</span>
     <span>{{ source.packets }}</span>
+    <span>{{ source.state }}</span>
     
   </div>
 </template>
