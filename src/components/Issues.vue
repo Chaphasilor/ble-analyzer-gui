@@ -17,7 +17,7 @@
         class="p-1 my-1 border-b border-gray-500 cursor-pointer"
         v-for="(issue, index) of issues"
         :key="index"
-        @click="$store.dispatch(`scrollToId`, getClosestPacket(issue.microseconds) - 1);"
+        @click="$store.dispatch(`scrollToId`, getClosestPacket(issue.microseconds));"
       >
         At {{ generateTimestamp(issue.microseconds) }}:
         <span
@@ -53,7 +53,7 @@ export default {
       
     },
     getClosestPacket(microseconds) {
-      return this.$store.getters.packets.filter(packet => packet.microseconds <= microseconds).splice(-1)[0].packetId
+      return this.$store.getters.packets.filter(packet => packet.microseconds <= microseconds).splice(-1)?.[0]?.packetId
     }
   }
 }

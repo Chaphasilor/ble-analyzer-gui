@@ -7,6 +7,8 @@
         class="grid content-center grid-flow-row grid-rows-1 gap-1 pr-4 text-center border-b-2 border-gray-700 grid-cols-advertiser-list"
       >
         <span>Advertising Address</span>
+        <span>Full Local Name</span>
+        <span>Short Local Name</span>
         <span>Total Packets</span>
       </div>
       

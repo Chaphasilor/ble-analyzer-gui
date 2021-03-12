@@ -43,6 +43,7 @@ export default class API {
 
         } 
 
+        // overwrite the previous onclose-handler after the socket is connected
         this.socket.onclose = (event) => {
 
           alert(`Lost connection to server! (Code: '${event.code}', Reason: '${event.reason}')`)

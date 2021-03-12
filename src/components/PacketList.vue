@@ -62,36 +62,10 @@ export default {
       return this.$store.getters.packets
     },
     filteredPackets: function() {
-
-      let filter = this.$store.getters.packetFilter
-      let filteredPackets = []
-
-      if (filter.length === 0) {
-        filteredPackets = this.packets
-      }
-
-      filteredPackets = this.packets.filter(packet => {
-        return filter.every(([key, value]) => {
-
-          let base = packet
-          for (const subkey of key) {
-            if (base) {
-              base = base[subkey]
-            } else {
-              return false
-            }
-          }
-
-          return base == value
-          
-        })
-      })
-
-      return filteredPackets.sort((a, b) => a.packetId > b.packetId ? 1 : -1) // sort by packetId (ascending)
-      
+      return this.$store.getters.filteredPackets
     },
-    scrollToId: function() {
-      return this.$store.getters.scrollToId
+    scrollToIndex: function() {
+      return this.$store.getters.scrollToIndex
     },
   },
   watch: {
@@ -99,7 +73,7 @@ export default {
       // scroll list (to top) to force re-rendering 
       this.$refs[`packet-list`].scrollToIndex(0)
     },
-    scrollToId(id) {
+    scrollToIndex(id) {
       if (!isNaN(id)) {
         this.$refs[`packet-list`].scrollToIndex(id)
       }
@@ -122,12 +96,12 @@ export default {
   mounted() {
 
     // prevent text selection on double click without preventing text selection by dragging
-    document.addEventListener('mousedown', preventSelection, false);
+    document.addEventListener(`mousedown`, preventSelection, false);
     
   },
   beforeDestroy() {
 
-    document.removeEventListener('mousedown', preventSelection, false);
+    document.removeEventListener(`mousedown`, preventSelection, false);
     
   }
 }

@@ -17,7 +17,7 @@ export default new Vuex.Store({
     issues: [],
     packetFilter: [],
     selectedPacket: NaN,
-    scrollToId: NaN,
+    scrollToIndex: NaN,
     liveActive: false,
   },
   mutations: {
@@ -42,8 +42,8 @@ export default new Vuex.Store({
     SET_SELECTED_PACKET(store, packetId) {
       store.selectedPacket = packetId
     },
-    SET_SCROLL_TO_ID(store, id) {
-      store.scrollToId = id
+    SET_SCROLL_TO_INDEX(store, index) {
+      store.scrollToIndex = index
     },
     SET_LIVE_ACTIVE(store, state) {
       store.liveActive = state
@@ -70,10 +70,24 @@ export default new Vuex.Store({
       console.log(`packetId:`, packetId)
     },
     scrollToId(context, id) {
-      if (context.getters.packets.find(x => x.packetId === id))
-      context.commit(`SET_SCROLL_TO_ID`, id)
-      console.log(`index:`, id)
-      setTimeout(() => context.commit(`SET_SCROLL_TO_ID`, NaN), 500)
+      if (context.getters.packets.find(x => x.packetId === id)) {
+
+        let foundPacket = context.getters.filteredPackets.find(x => x.packetId === id)
+
+        if (foundPacket) {
+
+          let packetIndex = context.getters.filteredPackets.indexOf(foundPacket)
+          context.commit(`SET_SCROLL_TO_INDEX`, packetIndex)
+          // console.log(`index:`, id)
+          setTimeout(() => context.dispatch(`clearSelectedPacket`), 500) // "blink"-effect 
+          
+        } else {
+          alert(`Packet is hidden by a filter`)
+        }
+
+      } else {
+        alert(`Packet not loaded yet! Try clicking on 'Load Packets' first!`)
+      }
     },
     connectToServer() {
 
@@ -88,39 +102,55 @@ export default new Vuex.Store({
     },
     async receiveLive(context) {
 
-      await api.connectToServer()
-      
-      try {
-        await Promise.all([
-          api.getLivePackets(),
-          api.getLiveConnections(),
-          api.getLiveAdvertisers(),
-          api.getLiveIssues(),
-        ])
-
+      if (!context.getters.liveActive) {
+        
         context.commit(`SET_LIVE_ACTIVE`, true)
+        try {
+          await api.connectToServer()
+        } catch (err) {
+          context.commit(`SET_LIVE_ACTIVE`, false)
+          return
+        }
+        
+        try {
+          await Promise.all([
+            api.getLivePackets(),
+            api.getLiveConnections(),
+            api.getLiveAdvertisers(),
+            api.getLiveIssues(),
+          ])
+  
+        } catch (err) {
+          console.error(`Failed to subscribe to some live commands:`, err)
+          alert(`Couldn't start some live commands! Please try again.`)
+          context.dispatch(`stopLive`)
+        }
 
-      } catch (err) {
-        console.error(`Failed to subscribe to some live commands:`, err)
-        alert(`Couldn't start some live commands! Please try again.`)
-        context.dispatch(`stopLive`)
+      } else {
+        console.warn(`Already subscribed!`)
+        //disabled because alerts stop script execution:
+        // alert(`Already subscribed!`)
       }
 
     },
     async stopLive(context) {
 
-      try {
-        await Promise.all([
-          api.endLivePackets(),
-          api.endLiveConnections(),
-          api.endLiveAdvertisers(),
-          api.endLiveIssues(),
-        ])
-  
-        context.commit(`SET_LIVE_ACTIVE`, false)
-      } catch (err) {
-        console.error(`Failed to unsubscribe to from live commands:`, err)
-        alert(`Couldn't stop some live commands! Please reload the page.`)
+      if (api.connected) {
+
+        try {
+          await Promise.all([
+            api.endLivePackets(),
+            api.endLiveConnections(),
+            api.endLiveAdvertisers(),
+            api.endLiveIssues(),
+          ])
+    
+          context.commit(`SET_LIVE_ACTIVE`, false)
+        } catch (err) {
+          console.error(`Failed to unsubscribe to from live commands:`, err)
+          alert(`Couldn't stop some live commands! Please reload the page.`)
+        }
+
       }
 
     },
@@ -185,11 +215,12 @@ export default new Vuex.Store({
     },
     clearEverything(context) {
 
-      context.commit(`SET_SELECTED_PACKET`, NaN)
-      context.commit(`SET_PACKETS`, [])
-      context.commit(`SET_CONNECTIONS`, [])
-      context.commit(`SET_ADVERTISERS`, [])
-      context.commit(`SET_ISSUES`, [])
+      context.dispatch(`clearPackets`)
+      context.dispatch(`clearConnections`)
+      context.dispatch(`clearAdvertisers`)
+      context.dispatch(`clearIssues`)
+      context.dispatch(`clearPacketFilter`)
+      context.dispatch(`clearSelectedPacket`)
       
     },
     clearPackets(context) {
@@ -207,6 +238,9 @@ export default new Vuex.Store({
     clearPacketFilter(context) {
       context.commit(`SET_PACKET_FILTER`, [])
     },
+    clearSelectedPacket(context) {
+      context.commit(`SET_SELECTED_PACKET`, NaN)
+    },
     async loadPacket(context, packetId) {
 
       let packet = await api.loadPacket(packetId) // might throw an error
@@ -217,12 +251,39 @@ export default new Vuex.Store({
   },
   getters: {
     packets: (store) => store.packets,
+    filteredPackets: (store) => {
+      let filter = store.packetFilter
+      let filteredPackets = []
+
+      if (filter.length === 0) {
+        filteredPackets = store.packets
+      }
+
+      filteredPackets = store.packets.filter(packet => {
+        return filter.every(([key, value]) => {
+
+          let base = packet
+          for (const subkey of key) {
+            if (base) {
+              base = base[subkey]
+            } else {
+              return false
+            }
+          }
+
+          return base == value
+          
+        })
+      })
+
+      return filteredPackets.sort((a, b) => a.packetId > b.packetId ? 1 : -1) // sort by packetId (ascending)
+    },
     connections: (store) => store.connections,
     advertisers: (store) => store.advertisers,
     issues: (store) => store.issues,
     packetFilter: (store) => store.packetFilter,
     selectedPacket: (store) => store.selectedPacket,
-    scrollToId: (store) => store.scrollToId,
+    scrollToIndex: (store) => store.scrollToIndex,
     liveActive: (store) => store.liveActive,
   }
 })

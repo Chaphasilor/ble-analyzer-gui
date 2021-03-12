@@ -104,7 +104,7 @@
       </table>
 
       <div
-        v-if="packet.advertisingData.length > 0"
+        v-if="packet.advertisingData"
         class="mb-6"
       >
 

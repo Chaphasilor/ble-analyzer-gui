@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list place-items-center"
-    :class="`${(source.malformed || !source.crcOk) ? `bg-red-300 hover:bg-red-400` : ``} ${scrollToId === index ? `bg-orange-300` : ``}`"
+    :class="`${(source.malformed || !source.crcOk) ? `bg-red-300 hover:bg-red-400` : ``} ${scrollToIndex === index ? `bg-orange-300` : ``}`"
     :title="source.malformed ? `This packet is malformed` : !source.crcOk ? `The packet's CRC isn't correct` : ``"
     @dblclick="$store.dispatch(`selectPacket`, source.packetId);"
   >
@@ -78,8 +78,8 @@ export default {
     detailsViewOpen() {
       return !isNaN(this.$store.getters.selectedPacket)
     },
-    scrollToId: function() {
-      return this.$store.getters.scrollToId
+    scrollToIndex: function() {
+      return this.$store.getters.scrollToIndex
     },
   },
   methods: {
