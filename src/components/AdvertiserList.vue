@@ -47,12 +47,13 @@ export default {
   mounted() {
 
     // prevent text selection on double click without preventing text selection by dragging
-    document.addEventListener('mousedown', preventSelection, false);
+    document.addEventListener(`mousedown`, preventSelection, false);
     
   },
   beforeDestroy() {
 
-    document.removeEventListener('mousedown', preventSelection, false);
+    // remove the event listener before unloading the component
+    document.removeEventListener(`mousedown`, preventSelection, false);
     
   }
 }

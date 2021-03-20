@@ -1,6 +1,6 @@
 <template>
   <div
-    class=""
+    class="overflow-x-auto"
   >
 
     <div
@@ -8,7 +8,7 @@
     >
       <h1
         class="text-2xl font-bold text-lightblue-600"
-      >BLE Analyzer</h1>
+      >Packet {{ selectedPacket }} - Details</h1>
 
       <button
         class="absolute top-0 left-0 p-2 text-white bg-orange-400"
@@ -21,14 +21,8 @@
     </div>
 
     <div
-      class="p-2 text-lg"
+      class="h-full p-2 text-lg"
     >
-
-      <h1
-        class="mb-6 text-2xl"
-      >
-        Packet {{ selectedPacket }} - Details
-      </h1>
 
       <div
         v-if="packet.malformed"
@@ -60,7 +54,7 @@
         <tr>
           <td>Time of Arrival</td>
           <td>
-            {{ `${String(date.getHours()).padStart(2, `0`)}:${String(date.getMinutes()).padStart(2, `0`)}:${String(date.getSeconds()).padStart(2, `0`)}.${String(date.getMilliseconds()).padEnd(3, `0`)}${String(packet.microseconds).slice(-3).padEnd(3, `0`)}` }}
+            {{ generateTimestamp(packet.microseconds) }}
             </td>
         </tr>
 
@@ -136,6 +130,39 @@
           
         </table>
 
+        <br>
+
+        <div
+          v-if="packet.advertisingData.filter(x => x.details).length > 0"
+        >
+        
+          <h4>Advertising Data Details</h4>
+          <br>
+
+          <ul>
+            <li
+              v-for="(entry, index) of packet.advertisingData.filter(x => x.details)"
+              :key="index"
+            >
+              <span
+                class="font-semibold"
+              >{{ entry.name }}:</span>
+              <ul
+                class="pl-4 pr-2"
+              >
+                <li
+                  v-for="(detail, index2) of entry.details"
+                  :key="index2"
+                >
+                  <span class="italic">{{ detail.description }}: </span>
+                  <span>{{ detail.supported }}</span>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+        </div>
+
       </div>
 
       <h2>
@@ -190,10 +217,6 @@
       
     </div>
 
-      <!-- <br>
-      <br>
-      {{ packet }} -->
-
   </div>
 </template>
 
@@ -224,11 +247,11 @@ export default {
     }
   },
   computed: {
+    /**
+     * ### Returns the currently selected packet from the store
+     */
     selectedPacket() {
       return this.$store.getters.selectedPacket
-    },
-    date() {
-      return new Date(Math.round(this.packet.microseconds/1000))
     },
   },
   watch: {
@@ -239,15 +262,21 @@ export default {
     }
   },
   methods: {
+    /**
+     * ### Loads the packet details (`full` format) from the store 
+     */
     loadPacket() {
 
       this.$store.dispatch(`loadPacket`, this.selectedPacket).then((packet) => {
-        console.log(`this.packet:`, JSON.parse(JSON.stringify(packet)));
+        // console.debug(`this.packet:`, JSON.parse(JSON.stringify(packet)));
         this.packet = packet
-        console.log(`this.packet.connection:`, this.packet.connection)
+        // console.debug(`this.packet.connection:`, this.packet.connection)
       })
         
     },
+    /**
+     * ### Applies a packet filter to only show packets from the same connection as the currently selected packet
+     */
     showConnection() {
 
       // filter applies to packetSummary object
@@ -256,10 +285,21 @@ export default {
         [[`accessAddress`], this.packet.connection.accessAddress],
       ])
       
-    }
+    },
+    /**
+     * ### Generates a human-readable timestamp from the packet's microseconds
+     * @param {Number} microseconds the microseconds when the packet arrived
+     */
+    generateTimestamp(microseconds) {
+
+      let timestampDate = new Date(Math.round(microseconds/1000))
+      return `${String(timestampDate.getHours()).padStart(2, `0`)}:${String(timestampDate.getMinutes()).padStart(2, `0`)}:${String(timestampDate.getSeconds()).padStart(2, `0`)}.${String(timestampDate.getMilliseconds()).padEnd(3, `0`)}${String(microseconds).slice(-3).padEnd(3, `0`)}`
+      
+    },
   },
   mounted() {
 
+    // load the packet details as soon as the component is loaded
     this.loadPacket()
     
   }

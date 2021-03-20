@@ -4,12 +4,14 @@ import API from '@/assets/js/api'
 
 Vue.use(Vuex)
 
+// set up the API outside the store so that it's easier to work with
 const websocketUrl = `ws://127.0.0.1:70`
 let api = new API(websocketUrl)
 
 export default new Vuex.Store({
   modules: {
   },
+  // set up the store's contents with default values
   state: {
     packets: [],
     connections: [],
@@ -20,6 +22,7 @@ export default new Vuex.Store({
     scrollToIndex: NaN,
     liveActive: false,
   },
+  // define mutations (methods that *directly* modify the store and have to be synchronous)
   mutations: {
     SET_PACKETS(store, packets) {
       store.packets = packets
@@ -48,10 +51,14 @@ export default new Vuex.Store({
     SET_LIVE_ACTIVE(store, state) {
       store.liveActive = state
     },
-},
+  },
+  // define actions (methods that can be async and either call mutations or API methods or both)
   actions: {
     addPackets(context, newPackets) {
       context.commit(`ADD_PACKETS`, newPackets)
+    },
+    setPackets(context, newPackets) {
+      context.commit(`SET_PACKETS`, newPackets)
     },
     setConnections(context, newConnections) {
       context.commit(`SET_CONNECTIONS`, newConnections)
@@ -69,17 +76,22 @@ export default new Vuex.Store({
       context.commit(`SET_SELECTED_PACKET`, packetId)
       console.log(`packetId:`, packetId)
     },
+    /**
+     * ### Scrolls the packet list to a specific packet id
+     * @param {Number} id the packet id to scroll to 
+     */
     scrollToId(context, id) {
+      // try to find the packet with the specified id in all available packets
       if (context.getters.packets.find(x => x.packetId === id)) {
 
+        // try to find the packet with the specified id in the filtered packets
         let foundPacket = context.getters.filteredPackets.find(x => x.packetId === id)
 
         if (foundPacket) {
 
           let packetIndex = context.getters.filteredPackets.indexOf(foundPacket)
-          context.commit(`SET_SCROLL_TO_INDEX`, packetIndex)
-          // console.log(`index:`, id)
-          setTimeout(() => context.dispatch(`clearSelectedPacket`), 500) // "blink"-effect 
+          context.commit(`SET_SCROLL_TO_INDEX`, packetIndex) // select the index, so that the scrolling happens in PacketList.vue
+          setTimeout(() => context.dispatch(`clearScrollToIndex`), 500) // "blink"-effect 
           
         } else {
           alert(`Packet is hidden by a filter`)
@@ -89,22 +101,32 @@ export default new Vuex.Store({
         alert(`Packet not loaded yet! Try clicking on 'Load Packets' first!`)
       }
     },
+    /**
+     * ### Connects to the backend through the API
+     */
     connectToServer() {
 
       api.connectToServer()
       .then(() => {
-        console.log(`Connected to socket!`)
+        console.info(`Connected to backend!`)
       })
       .catch(err => {
         console.error(`Error while connecting to the socket:`, err);
       })
       
     },
+    /**
+     * ### Subscribes to *all* live commands
+     * Also connects to the backend if not already connected
+     */
     async receiveLive(context) {
 
+      // only do this if not already subscribed
       if (!context.getters.liveActive) {
         
         context.commit(`SET_LIVE_ACTIVE`, true)
+
+        // connect to backend (resolves immediately if already connected)
         try {
           await api.connectToServer()
         } catch (err) {
@@ -113,6 +135,7 @@ export default new Vuex.Store({
         }
         
         try {
+          // subscribe to all commands
           await Promise.all([
             api.getLivePackets(),
             api.getLiveConnections(),
@@ -122,20 +145,24 @@ export default new Vuex.Store({
   
         } catch (err) {
           console.error(`Failed to subscribe to some live commands:`, err)
-          alert(`Couldn't start some live commands! Please try again.`)
           context.dispatch(`stopLive`)
+          alert(`Couldn't start some live commands! Please try again.`)
         }
 
       } else {
         console.warn(`Already subscribed!`)
-        //disabled because alerts stop script execution:
+        // disabled because alerts stop script execution:
         // alert(`Already subscribed!`)
       }
 
     },
+    /**
+     * ### Unsubscribes from *all* live commands
+     */
     async stopLive(context) {
 
-      if (api.connected) {
+      // only unsubscribe if actually connected and subscribed
+      if (api.connected && context.getters.liveActive) {
 
         try {
           await Promise.all([
@@ -154,6 +181,9 @@ export default new Vuex.Store({
       }
 
     },
+    /**
+     * ### Loads all info from the backend without subscribing
+     */
     async loadEverything() {
       try {
 
@@ -213,6 +243,9 @@ export default new Vuex.Store({
       })
 
     },
+    /**
+     * ### Removes all packets, etc. from the store, without unsubscribing from anything
+     */
     clearEverything(context) {
 
       context.dispatch(`clearPackets`)
@@ -241,6 +274,15 @@ export default new Vuex.Store({
     clearSelectedPacket(context) {
       context.commit(`SET_SELECTED_PACKET`, NaN)
     },
+    clearScrollToIndex(context) {
+      context.commit(`SET_SCROLL_TO_INDEX`, NaN)
+    },
+    /**
+     * ### Loads a packet in `full` format through the API
+     * Used to show packet details
+     * @param {Number} packetId the id of the packet to load
+     * @returns {Object} the loaded packet
+     */
     async loadPacket(context, packetId) {
 
       let packet = await api.loadPacket(packetId) // might throw an error
@@ -249,8 +291,10 @@ export default new Vuex.Store({
       
     },
   },
+  // defined getters for accessing the data inside the store inside the components
   getters: {
     packets: (store) => store.packets,
+    // use the packet filter to filter all available packets for matching criteria
     filteredPackets: (store) => {
       let filter = store.packetFilter
       let filteredPackets = []

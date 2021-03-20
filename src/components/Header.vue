@@ -10,6 +10,8 @@
       class="flex flex-row-reverse"
     >
 
+      <!-- Buttons to control the GUI -->
+
       <button
         class="p-2 text-white bg-lightblue-600"
         type="button"

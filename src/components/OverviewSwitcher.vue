@@ -34,6 +34,7 @@ export default {
     }
   },
   watch: {
+    // switch to the view defined by `this.onFilterChange` if the packet filter is changed
     packetFilter: {
       deep: true,
       handler: function() {
@@ -43,8 +44,8 @@ export default {
   },
   mounted() {
 
-    console.log(`this.value:`, this.value)
-    console.log(`this.onFilterChange:`, this.onFilterChange)
+    // console.debug(`this.value:`, this.value)
+    // console.debug(`this.onFilterChange:`, this.onFilterChange)
     
   }
 }

@@ -77,8 +77,8 @@ export default {
   },
   data: function() {
     return {
-      overviews: [`packets`, `connections`, `advertisers`],
-      selectedOverview: `packets`,
+      overviews: [`packets`, `connections`, `advertisers`], // configure overviews (tabs)
+      selectedOverview: `packets`, // default overview
       detailsOpen: false,
     }
   },
@@ -90,11 +90,11 @@ export default {
   watch: {
     detailsOpen() {
       if (!this.detailsOpen) {
-        this.$store.dispatch(`selectPacket`, NaN) // unselect packet
+        this.$store.dispatch(`selectPacket`, NaN) // unselect packet if details are closed
       }
     },
     selectedPacket() {
-      this.detailsOpen = !isNaN(this.selectedPacket)
+      this.detailsOpen = !isNaN(this.selectedPacket) // open details if a packet gets selected
     }
   },
 }

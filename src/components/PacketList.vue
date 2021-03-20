@@ -54,7 +54,7 @@ export default {
   data() {
     return {
       PacketSummaryComponent: PacketSummary,
-      userHasScrolled: false,
+      userHasScrolled: false, // tracks if the user has actively scrolled
     }
   },
   computed: {
@@ -79,8 +79,8 @@ export default {
       }
     },
     packets() {
-      // list won't stay scrolled if packets are updated :/
-      // if (!this.userHasScrolled) { 
+      // scroll to bottom if new packets arrive, unless th user has actively scrolled somewhere else
+      // if (!this.userHasScrolled) { // list won't stay scrolled if packets are updated :/
         this.$refs[`packet-list`].scrollToBottom()
       // }
     }
@@ -101,6 +101,7 @@ export default {
   },
   beforeDestroy() {
 
+    // remove the event listener before the component is unloaded
     document.removeEventListener(`mousedown`, preventSelection, false);
     
   }

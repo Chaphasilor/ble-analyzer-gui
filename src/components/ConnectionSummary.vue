@@ -46,9 +46,17 @@ export default {
   computed: {
   },
   methods: {
+    /**
+     * ### Interprets the last 6 bytes of the access address as a hex color
+     */
     accessAddressToColor(address) {
       return address.slice(4)
     },
+    /**
+     * ### Detect if a color is a light or a dark color
+     * Used to make sure text has enough contrast
+     * @returns {String} either `light` or `dark`
+     */
     colorLightOrDark(color) {
 
       var r = parseInt(color.slice(0, 2), `16`);

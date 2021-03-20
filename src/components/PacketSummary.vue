@@ -24,6 +24,7 @@
       <div
         class="grid w-full h-full place-items-center"
       >
+        <!-- `access-point` icon from https://github.com/tabler/tabler-icons -->
         <svg
           v-if="!source.isPartOfConnection"
           class="w-6 h-6 stroke-1.5"
@@ -83,15 +84,27 @@ export default {
     },
   },
   methods: {
+    /**
+     * ### Interprets the last 6 bytes of the access address as a hex color
+     */
     accessAddressToColor(address) {
       return address.slice(4)
     },
+    /**
+     * ### Generates a human-readable timestamp from the packet's microseconds
+     * @param {Number} microseconds the microseconds when the packet arrived
+     */
     generateTimestamp(microseconds) {
 
       let timestampDate = new Date(Math.round(microseconds/1000))
       return `${String(timestampDate.getHours()).padStart(2, `0`)}:${String(timestampDate.getMinutes()).padStart(2, `0`)}:${String(timestampDate.getSeconds()).padStart(2, `0`)}.${String(timestampDate.getMilliseconds()).padEnd(3, `0`)}${String(microseconds).slice(-3).padEnd(3, `0`)}`
       
     },
+    /**
+     * ### Detect if a color is a light or a dark color
+     * Used to make sure text has enough contrast
+     * @returns {String} either `light` or `dark`
+     */
     colorLightOrDark(color) {
 
       var r = parseInt(color.slice(0, 2), `16`);

@@ -21,7 +21,7 @@
       >
         At {{ generateTimestamp(issue.microseconds) }}:
         <span
-          :class="`px-1 ${issue.type === `warning` ? `bg-orange-400` : `bg-red-600 text-white`}`"
+          :class="`px-1 ${generateIssueColor(issue.type)}`"
         >{{ issue.message }}</span>
       </div>
 
@@ -46,12 +46,47 @@ export default {
     },
   },
   methods: {
+    /**
+     * ### Generates a human-readable timestamp from the issues's microseconds
+     * @param {Number} microseconds the microseconds when the issue occurred
+     */
     generateTimestamp(microseconds) {
 
       let timestampDate = new Date(Math.round(microseconds/1000))
       return `${String(timestampDate.getHours()).padStart(2, `0`)}:${String(timestampDate.getMinutes()).padStart(2, `0`)}:${String(timestampDate.getSeconds()).padStart(2, `0`)}.${String(timestampDate.getMilliseconds()).padEnd(3, `0`)}${String(microseconds).slice(-3).padEnd(3, `0`)}`
       
     },
+    /**
+     * ### Selects background and text color based on the type of the issue
+     * @param {String} issueType the type of the issue
+     */
+    generateIssueColor(issueType) {
+
+      let backgroundAndFontColor = ``
+
+      console.log(`issueType:`, issueType)
+
+      switch (issueType) {
+        case `warning`:
+          backgroundAndFontColor = `bg-orange-400`
+          break;
+
+        case `alert`:
+          backgroundAndFontColor = `bg-red-600 text-white`
+          break;
+      
+        default: // info
+          // don't add any color, infos are not important
+          break;
+      }
+
+      return backgroundAndFontColor
+
+    },
+    /**
+     * ### Finds the packet with the closest matching microsecond count
+     * @param {Number} microseconds the microseconds when the issue occurred
+     */
     getClosestPacket(microseconds) {
       return this.$store.getters.packets.filter(packet => packet.microseconds <= microseconds).splice(-1)?.[0]?.packetId
     }
