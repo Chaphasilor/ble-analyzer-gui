@@ -21,10 +21,10 @@
         <input
           id="backend-url"
           ref="backend-url"
-          class="w-1/2 p-2 mt-2"
+          class="w-full max-w-xl p-2 mt-2"
           type="text"
           name="backend-url"
-          placeholder="Enter URL here"
+          placeholder="Enter URL here, either ws:// or wss:// protocol"
         >
 
         <br>

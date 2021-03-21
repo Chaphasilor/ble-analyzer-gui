@@ -114,23 +114,29 @@ export default new Vuex.Store({
         alert(`Packet not loaded yet! Try clicking on 'Load Packets' first!`)
       }
     },
+    /**
+     * ### Updates the backend websocket url internally and in the API connection
+     * @param {String} url the new websocket URL 
+     */
     updateBackendUrl(context, url) {
 
       context.dispatch(`setBackendUrl`, url)
       api.setUrl(url)
+      context.dispatch(`connectToServer`)
       
     },
     /**
      * ### Connects to the backend through the API
      */
     connectToServer() {
-
+      
       api.connectToServer()
       .then(() => {
         console.info(`Connected to backend!`)
       })
       .catch(err => {
         console.error(`Error while connecting to the socket:`, err);
+        alert(`Couldn't connect to the websocket! Check the backend URL.`)
       })
       
     },

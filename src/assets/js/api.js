@@ -13,11 +13,12 @@ export default class API {
 
   /**
    * ### Sets the url to used for connecting to the websocket
-   * Won't connect to the url yet
+   * Disconnects from the old socket
    * @param {String} url the websocket url to connect to. protocol has to be `ws://` or `wss://`
    */
   setUrl(url) {
     this.url = url
+    this.socket = undefined
   }
 
   /**
@@ -57,7 +58,12 @@ export default class API {
       }
 
       console.info(`Connecting to websocket at '${this.url}'`)
-      this.socket = new WebSocket(this.url)
+      try {
+        this.socket = new WebSocket(this.url)
+      } catch (err) {
+        store.dispatch(`setConnectedToBackend`, false)
+        throw err
+      }
   
       this.socket.onopen = () => {
         
