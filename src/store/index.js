@@ -21,6 +21,7 @@ export default new Vuex.Store({
     selectedPacket: NaN,
     scrollToIndex: NaN,
     liveActive: false,
+    connectedToBackend: false,
   },
   // define mutations (methods that *directly* modify the store and have to be synchronous)
   mutations: {
@@ -51,6 +52,9 @@ export default new Vuex.Store({
     SET_LIVE_ACTIVE(store, state) {
       store.liveActive = state
     },
+    SET_CONNECTED_TO_BACKEND(store, state) {
+      store.connectedToBackend = state
+    },
   },
   // define actions (methods that can be async and either call mutations or API methods or both)
   actions: {
@@ -74,7 +78,10 @@ export default new Vuex.Store({
     },
     selectPacket(context, packetId) {
       context.commit(`SET_SELECTED_PACKET`, packetId)
-      console.log(`packetId:`, packetId)
+      console.debug(`packetId:`, packetId)
+    },
+    setConnectedToBackend(context, connected) {
+      context.commit(`SET_CONNECTED_TO_BACKEND`, connected)
     },
     /**
      * ### Scrolls the packet list to a specific packet id
@@ -131,6 +138,7 @@ export default new Vuex.Store({
           await api.connectToServer()
         } catch (err) {
           context.commit(`SET_LIVE_ACTIVE`, false)
+          alert(`Couldn't connect to the backend!`)
           return
         }
         
@@ -187,6 +195,7 @@ export default new Vuex.Store({
     async loadEverything() {
       try {
 
+        await api.connectToServer()
         await api.loadAllPackets()
         await api.loadAllConnections()
         await api.loadAllAdvertisers()
@@ -196,6 +205,7 @@ export default new Vuex.Store({
 
       } catch (err) {
         console.error(`Error loading everything:`, err)
+        alert(`Couldn't connect to the backend!`)
       }
     },
     loadAllPackets(context) {
@@ -329,5 +339,6 @@ export default new Vuex.Store({
     selectedPacket: (store) => store.selectedPacket,
     scrollToIndex: (store) => store.scrollToIndex,
     liveActive: (store) => store.liveActive,
+    connectedToBackend: (store) => store.connectedToBackend,
   }
 })

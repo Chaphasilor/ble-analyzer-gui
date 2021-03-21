@@ -15,13 +15,14 @@
 
       <div
         class="p-1 my-1 border-b border-gray-500 cursor-pointer"
+        :class="generateIssueColor(issue.type)"
         v-for="(issue, index) of issues"
         :key="index"
         @click="$store.dispatch(`scrollToId`, getClosestPacket(issue.microseconds));"
       >
         At {{ generateTimestamp(issue.microseconds) }}:
         <span
-          :class="`px-1 ${generateIssueColor(issue.type)}`"
+          class="px-1"
         >{{ issue.message }}</span>
       </div>
 
@@ -68,11 +69,11 @@ export default {
 
       switch (issueType) {
         case `warning`:
-          backgroundAndFontColor = `bg-orange-400`
+          backgroundAndFontColor = `bg-orange-300 hover:bg-red-400 text-black`
           break;
 
         case `alert`:
-          backgroundAndFontColor = `bg-red-600 text-white`
+          backgroundAndFontColor = `bg-red-300 hover:bg-red-400 text-black`
           break;
       
         default: // info

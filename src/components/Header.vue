@@ -2,9 +2,27 @@
   <div
     class="flex flex-row justify-between w-full h-full text-left bg-gray-300"
   >
-    <h1
-      class="p-2 text-2xl font-bold text-lightblue-600"
-    >BLE Analyzer</h1>
+
+    <div class="flex flex-row p-1">
+      
+      <h1
+        class="text-2xl font-bold text-lightblue-600"
+      >BLE Analyzer</h1>
+
+      <div
+        class="p-1 ml-12 text-lg font-semibold"
+      >
+        <span
+          v-if="$store.getters.connectedToBackend"
+          class="text-green-700"
+        >Connected</span>
+        <span
+          v-else
+          class="text-red-500"
+        >Disconnected</span>
+      </div>
+
+    </div>
 
     <div
       class="flex flex-row-reverse"

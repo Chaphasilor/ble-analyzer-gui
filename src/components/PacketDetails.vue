@@ -98,7 +98,7 @@
       </table>
 
       <div
-        v-if="packet.advertisingData"
+        v-if="packet.advertisingData && packet.advertisingData.length > 0"
         class="mb-6"
       >
 
@@ -165,6 +165,15 @@
 
       </div>
 
+      <button
+        v-if="packet.connection.isPartOfConnection"
+        class="block p-2 mb-6 text-white bg-lightblue-600"
+        type="button"
+        @click="showConnection"
+      >
+        Show Connection
+      </button>
+
       <h2>
         Protocols
       </h2>
@@ -205,15 +214,6 @@
         </tr>
         
       </table>
-
-      <button
-        v-if="packet.connection.isPartOfConnection"
-        class="block p-2 text-white bg-lightblue-600"
-        type="button"
-        @click="showConnection"
-      >
-        Show Connection
-      </button>
       
     </div>
 

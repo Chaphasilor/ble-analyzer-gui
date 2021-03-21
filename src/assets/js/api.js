@@ -63,6 +63,7 @@ export default class API {
           // wait for it, save it and then resolve
           this.socket.onmessage = (message) => {
             this.connectionId = JSON.parse(message.data)
+            store.dispatch(`setConnectedToBackend`, true) // update connection state in store
             return resolve()
           }
 
@@ -72,6 +73,7 @@ export default class API {
 
         // overwrite the previous onclose-handler after the socket is connected
         this.socket.onclose = (event) => {
+          store.dispatch(`setConnectedToBackend`, false) // update connection state in store
           alert(`Lost connection to server! (Code: '${event.code}', Reason: '${event.reason}')`)
         }
         
@@ -79,11 +81,13 @@ export default class API {
 
       // if the socket didn't open but threw an error
       this.socket.onerror = (error) => {
+        store.dispatch(`setConnectedToBackend`, false) // update connection state in store
         return reject(error)
       }
 
       // if the socket closed without opening first. unlikely to happen
       this.socket.onclose = () => {
+        store.dispatch(`setConnectedToBackend`, false) // update connection state in store
         return reject(new Error(`Can't connect to server!`))
       }
 

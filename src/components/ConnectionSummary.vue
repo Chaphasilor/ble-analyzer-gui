@@ -50,7 +50,7 @@
       </svg>
 
       <svg
-        v-if="details"
+        v-else
         class="w-8 h-8 stroke-current stroke-1"
         viewBox="0 0 24 24"
         fill="none"

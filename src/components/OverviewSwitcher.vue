@@ -6,7 +6,7 @@
     <button
       v-for="overviewName of overviews"
       :key="overviewName"
-      :class="`w-full ${value !== overviewName ? `bg-gray-400` : `focus:outline-none`}`"
+      :class="`w-full ${value !== overviewName ? `bg-gray-400 hover:bg-gray-200` : `focus:outline-none`}`"
       @click="$emit(`input`, overviewName)"
     >
       {{ overviewName.split(` `).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(` `) }}
