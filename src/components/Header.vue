@@ -3,7 +3,7 @@
     class="flex flex-row justify-between w-full h-full text-left bg-gray-300"
   >
     <h1
-      class="text-2xl font-bold text-lightblue-600"
+      class="p-2 text-2xl font-bold text-lightblue-600"
     >BLE Analyzer</h1>
 
     <div

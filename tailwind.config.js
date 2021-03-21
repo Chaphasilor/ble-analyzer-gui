@@ -25,7 +25,7 @@ module.exports = {
       gridTemplateColumns: {
         'main': `2fr 1fr`,
         'packet-list': '8ch 15ch 8ch 10ch 18ch 15ch 12ch minmax(10ch, 1fr) 8ch 5ch',
-        'connection-list': 'minmax(8ch, 1fr) minmax(15ch, 2fr) minmax(20ch, 2fr) minmax(20ch, 2fr) minmax(15ch, 1fr) minmax(10ch, 1fr)',
+        'connection-list': 'minmax(8ch, 1fr) minmax(15ch, 2fr) minmax(20ch, 2fr) minmax(20ch, 2fr) minmax(15ch, 1fr) minmax(10ch, 1fr) 8ch 3ch',
         'advertiser-list': 'minmax(20ch, 1fr) minmax(20ch, 1fr) minmax(20ch, 1fr) minmax(20ch, 1fr)',
       },
       strokeWidth: {
