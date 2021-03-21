@@ -3,6 +3,11 @@
     class="grid h-screen p-0 m-0 grid-rows-main grid-cols-main"
   >
     
+    <BackendConnectionDialog
+      v-if="backendUrl === ``"
+      class="fixed z-10 w-full h-full m-auto mx-auto"
+    />
+    
     <Header
       class="w-full h-10 col-span-full"
     />
@@ -63,6 +68,7 @@ import Issues from '@/components/Issues'
 import Header from '../components/Header.vue'
 import PacketDetails from '../components/PacketDetails.vue'
 import OverviewSwitcher from '../components/OverviewSwitcher.vue'
+import BackendConnectionDialog from '../components/BackendConnectionDialog.vue'
 
 export default {
   name: 'Home',
@@ -74,6 +80,7 @@ export default {
     Header,
     PacketDetails,
     OverviewSwitcher,
+    BackendConnectionDialog,
   },
   data: function() {
     return {
@@ -85,6 +92,9 @@ export default {
   computed: {
     selectedPacket() {
       return this.$store.getters.selectedPacket
+    },
+    backendUrl() {
+      return this.$store.getters.backendUrl
     },
   },
   watch: {

@@ -28,10 +28,20 @@
       class="flex flex-row-reverse"
     >
 
-      <!-- Buttons to control the GUI -->
+      <!-- Settings (Backend URL setup) -->
 
       <button
         class="p-2 text-white bg-lightblue-600"
+        type="button"
+        @click="$store.dispatch(`setBackendUrl`, ``)"
+      >
+        Settings
+      </button>
+
+      <!-- Buttons to control the GUI -->
+
+      <button
+        class="p-2 mr-1 text-white bg-lightblue-600"
         type="button"
         @click="$store.dispatch(`receiveLive`)"
       >
@@ -142,7 +152,7 @@
       </button>
       
     </div>
-    
+
   </div>
 </template>
 

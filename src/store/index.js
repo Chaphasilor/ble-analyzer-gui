@@ -5,8 +5,7 @@ import API from '@/assets/js/api'
 Vue.use(Vuex)
 
 // set up the API outside the store so that it's easier to work with
-const websocketUrl = `ws://127.0.0.1:70`
-let api = new API(websocketUrl)
+let api = new API()
 
 export default new Vuex.Store({
   modules: {
@@ -22,6 +21,7 @@ export default new Vuex.Store({
     scrollToIndex: NaN,
     liveActive: false,
     connectedToBackend: false,
+    backendUrl: ``,
   },
   // define mutations (methods that *directly* modify the store and have to be synchronous)
   mutations: {
@@ -55,6 +55,9 @@ export default new Vuex.Store({
     SET_CONNECTED_TO_BACKEND(store, state) {
       store.connectedToBackend = state
     },
+    SET_BACKEND_URL(store, url) {
+      store.backendUrl = url
+    }
   },
   // define actions (methods that can be async and either call mutations or API methods or both)
   actions: {
@@ -83,6 +86,9 @@ export default new Vuex.Store({
     setConnectedToBackend(context, connected) {
       context.commit(`SET_CONNECTED_TO_BACKEND`, connected)
     },
+    setBackendUrl(context, url) {
+      context.commit(`SET_BACKEND_URL`, url)
+    },
     /**
      * ### Scrolls the packet list to a specific packet id
      * @param {Number} id the packet id to scroll to 
@@ -107,6 +113,12 @@ export default new Vuex.Store({
       } else {
         alert(`Packet not loaded yet! Try clicking on 'Load Packets' first!`)
       }
+    },
+    updateBackendUrl(context, url) {
+
+      context.dispatch(`setBackendUrl`, url)
+      api.setUrl(url)
+      
     },
     /**
      * ### Connects to the backend through the API
@@ -340,5 +352,6 @@ export default new Vuex.Store({
     scrollToIndex: (store) => store.scrollToIndex,
     liveActive: (store) => store.liveActive,
     connectedToBackend: (store) => store.connectedToBackend,
+    backendUrl: (store) => store.backendUrl,
   }
 })

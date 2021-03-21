@@ -4,13 +4,20 @@ export default class API {
 
   /**
    * ### Creates a new instance of the API without connecting to the backend yet
-   * @param {String} url the websocket url to connect to. protocol has to be `ws://` or `wss://`
    */
-  constructor(url) {
+  constructor() {
 
-    this.url = url
     this.activeCommands = []
 
+  }
+
+  /**
+   * ### Sets the url to used for connecting to the websocket
+   * Won't connect to the url yet
+   * @param {String} url the websocket url to connect to. protocol has to be `ws://` or `wss://`
+   */
+  setUrl(url) {
+    this.url = url
   }
 
   /**
