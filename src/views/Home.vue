@@ -3,6 +3,11 @@
     class="grid h-screen p-0 m-0 grid-rows-main grid-cols-main"
   >
     
+    <BackendConnectionDialog
+      v-if="backendUrl === ``"
+      class="fixed z-10 w-full h-full m-auto mx-auto"
+    />
+    
     <Header
       class="w-full h-10 col-span-full"
     />
@@ -63,6 +68,7 @@ import Issues from '@/components/Issues'
 import Header from '../components/Header.vue'
 import PacketDetails from '../components/PacketDetails.vue'
 import OverviewSwitcher from '../components/OverviewSwitcher.vue'
+import BackendConnectionDialog from '../components/BackendConnectionDialog.vue'
 
 export default {
   name: 'Home',
@@ -74,11 +80,12 @@ export default {
     Header,
     PacketDetails,
     OverviewSwitcher,
+    BackendConnectionDialog,
   },
   data: function() {
     return {
-      overviews: [`packets`, `connections`, `advertisers`],
-      selectedOverview: `packets`,
+      overviews: [`packets`, `connections`, `advertisers`], // configure overviews (tabs)
+      selectedOverview: `packets`, // default overview
       detailsOpen: false,
     }
   },
@@ -86,15 +93,18 @@ export default {
     selectedPacket() {
       return this.$store.getters.selectedPacket
     },
+    backendUrl() {
+      return this.$store.getters.backendUrl
+    },
   },
   watch: {
     detailsOpen() {
       if (!this.detailsOpen) {
-        this.$store.dispatch(`selectPacket`, NaN) // unselect packet
+        this.$store.dispatch(`selectPacket`, NaN) // unselect packet if details are closed
       }
     },
     selectedPacket() {
-      this.detailsOpen = !isNaN(this.selectedPacket)
+      this.detailsOpen = !isNaN(this.selectedPacket) // open details if a packet gets selected
     }
   },
 }

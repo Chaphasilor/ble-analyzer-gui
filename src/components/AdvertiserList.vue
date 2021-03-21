@@ -7,6 +7,8 @@
         class="grid content-center grid-flow-row grid-rows-1 gap-1 pr-4 text-center border-b-2 border-gray-700 grid-cols-advertiser-list"
       >
         <span>Advertising Address</span>
+        <span>Full Local Name</span>
+        <span>Short Local Name</span>
         <span>Total Packets</span>
       </div>
       
@@ -45,12 +47,13 @@ export default {
   mounted() {
 
     // prevent text selection on double click without preventing text selection by dragging
-    document.addEventListener('mousedown', preventSelection, false);
+    document.addEventListener(`mousedown`, preventSelection, false);
     
   },
   beforeDestroy() {
 
-    document.removeEventListener('mousedown', preventSelection, false);
+    // remove the event listener before unloading the component
+    document.removeEventListener(`mousedown`, preventSelection, false);
     
   }
 }

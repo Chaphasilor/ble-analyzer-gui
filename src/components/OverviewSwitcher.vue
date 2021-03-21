@@ -6,7 +6,7 @@
     <button
       v-for="overviewName of overviews"
       :key="overviewName"
-      :class="`w-full ${value !== overviewName ? `bg-gray-400` : `focus:outline-none`}`"
+      :class="`w-full ${value !== overviewName ? `bg-gray-400 hover:bg-gray-200` : `focus:outline-none`}`"
       @click="$emit(`input`, overviewName)"
     >
       {{ overviewName.split(` `).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(` `) }}
@@ -34,6 +34,7 @@ export default {
     }
   },
   watch: {
+    // switch to the view defined by `this.onFilterChange` if the packet filter is changed
     packetFilter: {
       deep: true,
       handler: function() {
@@ -43,8 +44,8 @@ export default {
   },
   mounted() {
 
-    console.log(`this.value:`, this.value)
-    console.log(`this.onFilterChange:`, this.onFilterChange)
+    // console.debug(`this.value:`, this.value)
+    // console.debug(`this.onFilterChange:`, this.onFilterChange)
     
   }
 }

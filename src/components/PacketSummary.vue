@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid content-center grid-flow-row grid-rows-1 gap-1 text-center border-b border-gray-700 cursor-pointer hover:bg-gray-300 grid-cols-packet-list place-items-center"
-    :class="`${(source.malformed || !source.crcOk) ? `bg-red-300 hover:bg-red-400` : ``} ${scrollToIndex === index ? `bg-orange-300` : ``}`"
+    :class="`${(source.malformed || !source.crcOk) ? `bg-red-300 hover:bg-red-400` : ``} ${scrollToIndex === index ? `bg-orange-300 hover:bg-orange-400` : ``}`"
     :title="source.malformed ? `This packet is malformed` : !source.crcOk ? `The packet's CRC isn't correct` : ``"
     @dblclick="$store.dispatch(`selectPacket`, source.packetId);"
   >
@@ -24,6 +24,7 @@
       <div
         class="grid w-full h-full place-items-center"
       >
+        <!-- `access-point` icon from https://github.com/tabler/tabler-icons -->
         <svg
           v-if="!source.isPartOfConnection"
           class="w-6 h-6 stroke-1.5"
@@ -41,9 +42,9 @@
 
     <span>{{ source.highestProtocol }}</span>
 
-      <!-- :class="detailsViewOpen ? `whitespace-nowrap` : `whitespace-pre-wrap`" -->
+    <!-- force scroll bar so all packet summaries have the same height, else there are issues with scrolling to the right offset -->
     <span
-      class="w-full overflow-x-auto font-mono tracking-tight text-left whitespace-nowrap place-self-start"
+      class="w-full overflow-x-scroll font-mono tracking-tight text-left whitespace-nowrap place-self-start"
       style="word-spacing: -0.25rem;"
       v-html="source.isAdvertisement ? highlightAdvertisingAddress(payloadFormatted) : payloadFormatted"
     ></span>
@@ -83,15 +84,27 @@ export default {
     },
   },
   methods: {
+    /**
+     * ### Interprets the last 6 bytes of the access address as a hex color
+     */
     accessAddressToColor(address) {
       return address.slice(4)
     },
+    /**
+     * ### Generates a human-readable timestamp from the packet's microseconds
+     * @param {Number} microseconds the microseconds when the packet arrived
+     */
     generateTimestamp(microseconds) {
 
       let timestampDate = new Date(Math.round(microseconds/1000))
       return `${String(timestampDate.getHours()).padStart(2, `0`)}:${String(timestampDate.getMinutes()).padStart(2, `0`)}:${String(timestampDate.getSeconds()).padStart(2, `0`)}.${String(timestampDate.getMilliseconds()).padEnd(3, `0`)}${String(microseconds).slice(-3).padEnd(3, `0`)}`
       
     },
+    /**
+     * ### Detect if a color is a light or a dark color
+     * Used to make sure text has enough contrast
+     * @returns {String} either `light` or `dark`
+     */
     colorLightOrDark(color) {
 
       var r = parseInt(color.slice(0, 2), `16`);

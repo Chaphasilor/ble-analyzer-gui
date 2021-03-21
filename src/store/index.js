@@ -4,12 +4,13 @@ import API from '@/assets/js/api'
 
 Vue.use(Vuex)
 
-const websocketUrl = `ws://127.0.0.1:70`
-let api = new API(websocketUrl)
+// set up the API outside the store so that it's easier to work with
+let api = new API()
 
 export default new Vuex.Store({
   modules: {
   },
+  // set up the store's contents with default values
   state: {
     packets: [],
     connections: [],
@@ -17,9 +18,12 @@ export default new Vuex.Store({
     issues: [],
     packetFilter: [],
     selectedPacket: NaN,
-    scrollToId: NaN,
+    scrollToIndex: NaN,
     liveActive: false,
+    connectedToBackend: false,
+    backendUrl: ``,
   },
+  // define mutations (methods that *directly* modify the store and have to be synchronous)
   mutations: {
     SET_PACKETS(store, packets) {
       store.packets = packets
@@ -42,16 +46,26 @@ export default new Vuex.Store({
     SET_SELECTED_PACKET(store, packetId) {
       store.selectedPacket = packetId
     },
-    SET_SCROLL_TO_ID(store, id) {
-      store.scrollToId = id
+    SET_SCROLL_TO_INDEX(store, index) {
+      store.scrollToIndex = index
     },
     SET_LIVE_ACTIVE(store, state) {
       store.liveActive = state
     },
-},
+    SET_CONNECTED_TO_BACKEND(store, state) {
+      store.connectedToBackend = state
+    },
+    SET_BACKEND_URL(store, url) {
+      store.backendUrl = url
+    }
+  },
+  // define actions (methods that can be async and either call mutations or API methods or both)
   actions: {
     addPackets(context, newPackets) {
       context.commit(`ADD_PACKETS`, newPackets)
+    },
+    setPackets(context, newPackets) {
+      context.commit(`SET_PACKETS`, newPackets)
     },
     setConnections(context, newConnections) {
       context.commit(`SET_CONNECTIONS`, newConnections)
@@ -67,66 +81,139 @@ export default new Vuex.Store({
     },
     selectPacket(context, packetId) {
       context.commit(`SET_SELECTED_PACKET`, packetId)
-      console.log(`packetId:`, packetId)
+      console.debug(`packetId:`, packetId)
     },
+    setConnectedToBackend(context, connected) {
+      context.commit(`SET_CONNECTED_TO_BACKEND`, connected)
+    },
+    setBackendUrl(context, url) {
+      context.commit(`SET_BACKEND_URL`, url)
+    },
+    /**
+     * ### Scrolls the packet list to a specific packet id
+     * @param {Number} id the packet id to scroll to 
+     */
     scrollToId(context, id) {
-      if (context.getters.packets.find(x => x.packetId === id))
-      context.commit(`SET_SCROLL_TO_ID`, id)
-      console.log(`index:`, id)
-      setTimeout(() => context.commit(`SET_SCROLL_TO_ID`, NaN), 500)
-    },
-    connectToServer() {
+      // try to find the packet with the specified id in all available packets
+      if (context.getters.packets.find(x => x.packetId === id)) {
 
+        // try to find the packet with the specified id in the filtered packets
+        let foundPacket = context.getters.filteredPackets.find(x => x.packetId === id)
+
+        if (foundPacket) {
+
+          let packetIndex = context.getters.filteredPackets.indexOf(foundPacket)
+          context.commit(`SET_SCROLL_TO_INDEX`, packetIndex) // select the index, so that the scrolling happens in PacketList.vue
+          setTimeout(() => context.dispatch(`clearScrollToIndex`), 500) // "blink"-effect 
+          
+        } else {
+          alert(`Packet is hidden by a filter`)
+        }
+
+      } else {
+        alert(`Packet not loaded yet! Try clicking on 'Load Packets' first!`)
+      }
+    },
+    /**
+     * ### Updates the backend websocket url internally and in the API connection
+     * @param {String} url the new websocket URL 
+     */
+    updateBackendUrl(context, url) {
+
+      context.dispatch(`setBackendUrl`, url)
+      api.setUrl(url)
+      context.dispatch(`connectToServer`)
+      
+    },
+    /**
+     * ### Connects to the backend through the API
+     */
+    connectToServer() {
+      
       api.connectToServer()
       .then(() => {
-        console.log(`Connected to socket!`)
+        console.info(`Connected to backend!`)
       })
       .catch(err => {
         console.error(`Error while connecting to the socket:`, err);
+        alert(`Couldn't connect to the websocket! Check the backend URL.`)
       })
       
     },
+    /**
+     * ### Subscribes to *all* live commands
+     * Also connects to the backend if not already connected
+     */
     async receiveLive(context) {
 
-      await api.connectToServer()
-      
-      try {
-        await Promise.all([
-          api.getLivePackets(),
-          api.getLiveConnections(),
-          api.getLiveAdvertisers(),
-          api.getLiveIssues(),
-        ])
-
+      // only do this if not already subscribed
+      if (!context.getters.liveActive) {
+        
         context.commit(`SET_LIVE_ACTIVE`, true)
 
-      } catch (err) {
-        console.error(`Failed to subscribe to some live commands:`, err)
-        alert(`Couldn't start some live commands! Please try again.`)
-        context.dispatch(`stopLive`)
+        // connect to backend (resolves immediately if already connected)
+        try {
+          await api.connectToServer()
+        } catch (err) {
+          context.commit(`SET_LIVE_ACTIVE`, false)
+          alert(`Couldn't connect to the backend!`)
+          return
+        }
+        
+        try {
+          // subscribe to all commands
+          await Promise.all([
+            api.getLivePackets(),
+            api.getLiveConnections(),
+            api.getLiveAdvertisers(),
+            api.getLiveIssues(),
+          ])
+  
+        } catch (err) {
+          console.error(`Failed to subscribe to some live commands:`, err)
+          context.dispatch(`stopLive`)
+          alert(`Couldn't start some live commands! Please try again.`)
+        }
+
+      } else {
+        console.warn(`Already subscribed!`)
+        // disabled because alerts stop script execution:
+        // alert(`Already subscribed!`)
       }
 
     },
+    /**
+     * ### Unsubscribes from *all* live commands
+     */
     async stopLive(context) {
 
-      try {
-        await Promise.all([
-          api.endLivePackets(),
-          api.endLiveConnections(),
-          api.endLiveAdvertisers(),
-          api.endLiveIssues(),
-        ])
-  
-        context.commit(`SET_LIVE_ACTIVE`, false)
-      } catch (err) {
-        console.error(`Failed to unsubscribe to from live commands:`, err)
-        alert(`Couldn't stop some live commands! Please reload the page.`)
+      // only unsubscribe if actually connected and subscribed
+      if (api.connected && context.getters.liveActive) {
+
+        try {
+          await Promise.all([
+            api.endLivePackets(),
+            api.endLiveConnections(),
+            api.endLiveAdvertisers(),
+            api.endLiveIssues(),
+          ])
+    
+          context.commit(`SET_LIVE_ACTIVE`, false)
+        } catch (err) {
+          console.error(`Failed to unsubscribe to from live commands:`, err)
+          alert(`Couldn't stop some live commands! Please reload the page.`)
+        }
+
       }
 
     },
+    /**
+     * ### Loads all info from the backend without subscribing
+     */
     async loadEverything() {
       try {
 
+        await api.connectToServer()
         await api.loadAllPackets()
         await api.loadAllConnections()
         await api.loadAllAdvertisers()
@@ -136,6 +223,7 @@ export default new Vuex.Store({
 
       } catch (err) {
         console.error(`Error loading everything:`, err)
+        alert(`Couldn't connect to the backend!`)
       }
     },
     loadAllPackets(context) {
@@ -183,12 +271,17 @@ export default new Vuex.Store({
       })
 
     },
+    /**
+     * ### Removes all packets, etc. from the store, without unsubscribing from anything
+     */
     clearEverything(context) {
 
-      context.commit(`SET_PACKETS`, [])
-      context.commit(`SET_CONNECTIONS`, [])
-      context.commit(`SET_ADVERTISERS`, [])
-      context.commit(`SET_ISSUES`, [])
+      context.dispatch(`clearPackets`)
+      context.dispatch(`clearConnections`)
+      context.dispatch(`clearAdvertisers`)
+      context.dispatch(`clearIssues`)
+      context.dispatch(`clearPacketFilter`)
+      context.dispatch(`clearSelectedPacket`)
       
     },
     clearPackets(context) {
@@ -206,6 +299,18 @@ export default new Vuex.Store({
     clearPacketFilter(context) {
       context.commit(`SET_PACKET_FILTER`, [])
     },
+    clearSelectedPacket(context) {
+      context.commit(`SET_SELECTED_PACKET`, NaN)
+    },
+    clearScrollToIndex(context) {
+      context.commit(`SET_SCROLL_TO_INDEX`, NaN)
+    },
+    /**
+     * ### Loads a packet in `full` format through the API
+     * Used to show packet details
+     * @param {Number} packetId the id of the packet to load
+     * @returns {Object} the loaded packet
+     */
     async loadPacket(context, packetId) {
 
       let packet = await api.loadPacket(packetId) // might throw an error
@@ -214,14 +319,45 @@ export default new Vuex.Store({
       
     },
   },
+  // defined getters for accessing the data inside the store inside the components
   getters: {
     packets: (store) => store.packets,
+    // use the packet filter to filter all available packets for matching criteria
+    filteredPackets: (store) => {
+      let filter = store.packetFilter
+      let filteredPackets = []
+
+      if (filter.length === 0) {
+        filteredPackets = store.packets
+      }
+
+      filteredPackets = store.packets.filter(packet => {
+        return filter.every(([key, value]) => {
+
+          let base = packet
+          for (const subkey of key) {
+            if (base) {
+              base = base[subkey]
+            } else {
+              return false
+            }
+          }
+
+          return base == value
+          
+        })
+      })
+
+      return filteredPackets.sort((a, b) => a.packetId > b.packetId ? 1 : -1) // sort by packetId (ascending)
+    },
     connections: (store) => store.connections,
     advertisers: (store) => store.advertisers,
     issues: (store) => store.issues,
     packetFilter: (store) => store.packetFilter,
     selectedPacket: (store) => store.selectedPacket,
-    scrollToId: (store) => store.scrollToId,
+    scrollToIndex: (store) => store.scrollToIndex,
     liveActive: (store) => store.liveActive,
+    connectedToBackend: (store) => store.connectedToBackend,
+    backendUrl: (store) => store.backendUrl,
   }
 })

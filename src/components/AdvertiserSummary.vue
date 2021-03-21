@@ -10,6 +10,10 @@
       class="font-mono"
     >{{ source.advertisingAddress }}</span>
 
+    <span>{{ source.completeLocalName }}</span>
+
+    <span>{{ source.shortLocalName }}</span>
+
     <span>{{ source.packets }}</span>
     
   </div>

@@ -54,7 +54,7 @@ export default {
   data() {
     return {
       PacketSummaryComponent: PacketSummary,
-      userHasScrolled: false,
+      userHasScrolled: false, // tracks if the user has actively scrolled
     }
   },
   computed: {
@@ -62,36 +62,10 @@ export default {
       return this.$store.getters.packets
     },
     filteredPackets: function() {
-
-      let filter = this.$store.getters.packetFilter
-      let filteredPackets = []
-
-      if (filter.length === 0) {
-        filteredPackets = this.packets
-      }
-
-      filteredPackets = this.packets.filter(packet => {
-        return filter.every(([key, value]) => {
-
-          let base = packet
-          for (const subkey of key) {
-            if (base) {
-              base = base[subkey]
-            } else {
-              return false
-            }
-          }
-
-          return base == value
-          
-        })
-      })
-
-      return filteredPackets.sort((a, b) => a.packetId > b.packetId ? 1 : -1) // sort by packetId (ascending)
-      
+      return this.$store.getters.filteredPackets
     },
-    scrollToId: function() {
-      return this.$store.getters.scrollToId
+    scrollToIndex: function() {
+      return this.$store.getters.scrollToIndex
     },
   },
   watch: {
@@ -99,14 +73,14 @@ export default {
       // scroll list (to top) to force re-rendering 
       this.$refs[`packet-list`].scrollToIndex(0)
     },
-    scrollToId(id) {
+    scrollToIndex(id) {
       if (!isNaN(id)) {
         this.$refs[`packet-list`].scrollToIndex(id)
       }
     },
     packets() {
-      // list won't stay scrolled if packets are updated :/
-      // if (!this.userHasScrolled) { 
+      // scroll to bottom if new packets arrive, unless th user has actively scrolled somewhere else
+      // if (!this.userHasScrolled) { // list won't stay scrolled if packets are updated :/
         this.$refs[`packet-list`].scrollToBottom()
       // }
     }
@@ -122,12 +96,13 @@ export default {
   mounted() {
 
     // prevent text selection on double click without preventing text selection by dragging
-    document.addEventListener('mousedown', preventSelection, false);
+    document.addEventListener(`mousedown`, preventSelection, false);
     
   },
   beforeDestroy() {
 
-    document.removeEventListener('mousedown', preventSelection, false);
+    // remove the event listener before the component is unloaded
+    document.removeEventListener(`mousedown`, preventSelection, false);
     
   }
 }

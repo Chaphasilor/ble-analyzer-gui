@@ -1,6 +1,6 @@
 <template>
   <div
-    class=""
+    class="overflow-x-auto"
   >
 
     <div
@@ -8,7 +8,7 @@
     >
       <h1
         class="text-2xl font-bold text-lightblue-600"
-      >BLE Analyzer</h1>
+      >Packet {{ selectedPacket }} - Details</h1>
 
       <button
         class="absolute top-0 left-0 p-2 text-white bg-orange-400"
@@ -21,20 +21,27 @@
     </div>
 
     <div
-      class="p-2 text-lg"
+      class="h-full p-2 text-lg"
     >
-
-      <h1
-        class="mb-6 text-2xl"
-      >
-        Packet {{ selectedPacket }} - Details
-      </h1>
 
       <div
         v-if="packet.malformed"
-        class="inline-block p-2 mb-4 text-white bg-red-600"
+        class="w-full p-2 mb-4 text-center text-white bg-red-600"
       >
-        The Package is malformed. Below information might be incorrect!
+        The packet seems to be malformed. The information below might be incorrect!
+      </div>
+
+      <div
+        v-if="!packet.crcOk"
+        class="w-full p-2 mb-4 text-center text-white bg-orange-600"
+      >
+        The packet's CRC (checksum) seems to be bad.
+        <br>
+        <span
+          class="font-mono"
+        >CRC is {{ 
+          packet.protocols.find(proto => proto.shortName === `btle`) ? packet.protocols.find(proto => proto.shortName === `btle`).crc : `unknown`
+         }}</span>
       </div>
 
       <h2>
@@ -47,18 +54,18 @@
         <tr>
           <td>Time of Arrival</td>
           <td>
-            {{ `${String(date.getHours()).padStart(2, `0`)}:${String(date.getMinutes()).padStart(2, `0`)}:${String(date.getSeconds()).padStart(2, `0`)}.${String(date.getMilliseconds()).padEnd(3, `0`)}${String(packet.microseconds).slice(-3).padEnd(3, `0`)}` }}
+            {{ generateTimestamp(packet.microseconds) }}
             </td>
         </tr>
 
         <tr>
-          <td>Channel Number</td>
-          <td>{{ packet.channel }}</td>
+          <td>RSSI</td>
+          <td>{{ packet.rssi }} dBm</td>
         </tr>
 
         <tr>
-          <td>Channel Type</td>
-          <td>{{ packet.isOnPrimaryAdvertisingChannel ? `Primary Advertising` : `Data or Secondary Advertising` }}</td>
+          <td>Channel Number</td>
+          <td>{{ packet.channel }} ({{ packet.isOnPrimaryAdvertisingChannel ? `primary advertising` : `data or secondary advertising` }})</td>
         </tr>
 
         <tr>
@@ -73,27 +80,99 @@
         
         <tr>
           <td>Source Device Address</td>
-          <td>{{ packet.source }}</td>
+          <td class="font-mono">{{ packet.source }}</td>
         </tr>
 
         <tr
           v-if="packet.destination !== ``"
         >
           <td>Destination Device Address</td>
-          <td>{{ packet.destination }}</td>
-        </tr>
-
-        <tr>
-          <td>Protocols Used</td>
-          <td>{{ packet.protocols.map(protocol => protocol.name).join(`, `) }}</td>
+          <td class="font-mono">{{ packet.destination }}</td>
         </tr>
 
         <tr>
           <td>Frame length</td>
-          <td>{{ packet.length }} byte</td>
+          <td>{{ packet.length }} bytes</td>
         </tr>
 
       </table>
+
+      <div
+        v-if="packet.advertisingData && packet.advertisingData.length > 0"
+        class="mb-6"
+      >
+
+        <h3>{{ packet.isPrimaryAdvertisement ? `Advertising Data` : `Scan Response Advertising Data` }}</h3>
+
+        <table
+          class="border border-gray-500"
+        >
+
+          <tr
+            class="border-b border-gray-500"
+          >
+            <th>Type</th>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Length</th>
+          </tr>
+
+          <tr
+            class=""
+            v-for="(entry, index) of packet.advertisingData"
+            :key="index"
+          >
+            <td class="p-2 font-mono text-center border border-gray-500">{{ entry.type }}</td>
+            <td class="p-2 text-center border border-gray-500">{{ entry.name }}</td>
+            <td class="p-2 font-mono text-center border border-gray-500">{{ entry.value }}</td>
+            <td class="p-2 text-center border border-gray-500">{{ entry.length }}</td>
+          </tr>
+          
+        </table>
+
+        <br>
+
+        <div
+          v-if="packet.advertisingData.filter(x => x.details).length > 0"
+        >
+        
+          <h4>Advertising Data Details</h4>
+          <br>
+
+          <ul>
+            <li
+              v-for="(entry, index) of packet.advertisingData.filter(x => x.details)"
+              :key="index"
+            >
+              <span
+                class="font-semibold"
+              >{{ entry.name }}:</span>
+              <ul
+                class="pl-4 pr-2"
+              >
+                <li
+                  v-for="(detail, index2) of entry.details"
+                  :key="index2"
+                >
+                  <span class="italic">{{ detail.description }}: </span>
+                  <span>{{ detail.supported }}</span>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+        </div>
+
+      </div>
+
+      <button
+        v-if="packet.connection.isPartOfConnection"
+        class="block p-2 mb-6 text-white bg-lightblue-600"
+        type="button"
+        @click="showConnection"
+      >
+        Show Connection
+      </button>
 
       <h2>
         Protocols
@@ -135,21 +214,8 @@
         </tr>
         
       </table>
-
-      <button
-        v-if="packet.connection.isPartOfConnection"
-        class="block p-2 text-white bg-lightblue-600"
-        type="button"
-        @click="showConnection"
-      >
-        Show Connection
-      </button>
       
     </div>
-
-      <!-- <br>
-      <br>
-      {{ packet }} -->
 
   </div>
 </template>
@@ -181,11 +247,11 @@ export default {
     }
   },
   computed: {
+    /**
+     * ### Returns the currently selected packet from the store
+     */
     selectedPacket() {
       return this.$store.getters.selectedPacket
-    },
-    date() {
-      return new Date(Math.round(this.packet.microseconds/1000))
     },
   },
   watch: {
@@ -196,15 +262,21 @@ export default {
     }
   },
   methods: {
+    /**
+     * ### Loads the packet details (`full` format) from the store 
+     */
     loadPacket() {
 
       this.$store.dispatch(`loadPacket`, this.selectedPacket).then((packet) => {
-        console.log(`this.packet:`, JSON.parse(JSON.stringify(packet)));
+        // console.debug(`this.packet:`, JSON.parse(JSON.stringify(packet)));
         this.packet = packet
-        console.log(`this.packet.connection:`, this.packet.connection)
+        // console.debug(`this.packet.connection:`, this.packet.connection)
       })
         
     },
+    /**
+     * ### Applies a packet filter to only show packets from the same connection as the currently selected packet
+     */
     showConnection() {
 
       // filter applies to packetSummary object
@@ -213,10 +285,21 @@ export default {
         [[`accessAddress`], this.packet.connection.accessAddress],
       ])
       
-    }
+    },
+    /**
+     * ### Generates a human-readable timestamp from the packet's microseconds
+     * @param {Number} microseconds the microseconds when the packet arrived
+     */
+    generateTimestamp(microseconds) {
+
+      let timestampDate = new Date(Math.round(microseconds/1000))
+      return `${String(timestampDate.getHours()).padStart(2, `0`)}:${String(timestampDate.getMinutes()).padStart(2, `0`)}:${String(timestampDate.getSeconds()).padStart(2, `0`)}.${String(timestampDate.getMilliseconds()).padEnd(3, `0`)}${String(microseconds).slice(-3).padEnd(3, `0`)}`
+      
+    },
   },
   mounted() {
 
+    // load the packet details as soon as the component is loaded
     this.loadPacket()
     
   }
