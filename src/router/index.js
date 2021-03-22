@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import PacketDetails from '../views/PacketDetails.vue'
 
 Vue.use(VueRouter)
 
@@ -11,14 +10,6 @@ const routes = [
     name: 'Home',
     component: Home
   },
-  {
-    path: "/packet/:packetId",
-    name: "PacketDetails",
-    component: PacketDetails,
-    meta: {
-      title: 'Packet Details',
-    }
-  }
 ]
 
 const router = new VueRouter({

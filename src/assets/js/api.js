@@ -2,41 +2,33 @@ import store from '@/store/index'
 
 export default class API {
 
-  constructor(url) {
+  /**
+   * ### Creates a new instance of the API without connecting to the backend yet
+   */
+  constructor() {
 
-    this.url = url
     this.activeCommands = []
 
   }
 
-  formatBytes(bytes, decimals = 2) {
-
-    if (bytes === 0) return `0 B`;
-  
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = [`B`, `KB`, `MB`, `GB`, `TB`, `PB`, `EB`, `ZB`, `YB`];
-  
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ` ` + sizes[i];
-
-  }
-  
-  dotify(number) {
-
-    let reversedNumberAsString = String(number).split(``).reverse().join(``);
-    let dotifiedNumber = ``;
-    for (let i = 0; i < reversedNumberAsString.length; i++) {
-      dotifiedNumber = `${reversedNumberAsString.charAt(i)}${(i%3===0 && i!=0) ? `.` : ``}${dotifiedNumber}`;
-    }
-    return dotifiedNumber;
-    
+  /**
+   * ### Sets the url to used for connecting to the websocket
+   * Disconnects from the old socket
+   * @param {String} url the websocket url to connect to. protocol has to be `ws://` or `wss://`
+   */
+  setUrl(url) {
+    this.url = url
+    this.socket = undefined
   }
 
+  /**
+   * ### Parses the payload of a websocket message
+   * @param {Object} message the message received through the websocket
+   * @returns {Object} the parsed payload
+   */
   parseMessage(message) {
 
-    // console.log(`message:`, message);
+    // console.debug(`message:`, message);
     
     try {
       return JSON.parse(message.data)
@@ -46,42 +38,96 @@ export default class API {
 
   }
 
+  /**
+   * **Getter** is API connection established and ready?
+   */
   get connected() {
     return this.socket != undefined && this.socket.readyState === WebSocket.OPEN
   }
 
+  /**
+   * ### Connects to the backend API
+   * @resolves undefined
+   * @rejects {Error} the reason why the connection couldn't be established
+   */
   connectToServer() {
     return new Promise((resolve, reject) => {
 
-      this.socket = new WebSocket(this.url)
+      if (this.connected) {
+        return resolve()
+      }
+
+      console.info(`Connecting to websocket at '${this.url}'`)
+      try {
+        this.socket = new WebSocket(this.url)
+      } catch (err) {
+        store.dispatch(`setConnectedToBackend`, false)
+        clearInterval(this.pingIntervalId) // clear keep-alive interval
+        throw err
+      }
   
       this.socket.onopen = () => {
+        
+
         if (this.socket.readyState === WebSocket.OPEN) {
 
-          console.log(`Socket opened!`)
-          return resolve()
+          console.info(`Socket opened!`)
+          
+          // upon connection, the server will send its assigned socket ID over the socket
+          // wait for it, save it and then resolve
+          this.socket.onmessage = (message) => {
+            this.connectionId = JSON.parse(message.data)
+            store.dispatch(`setConnectedToBackend`, true) // update connection state in store
+            return resolve()
+          }
 
-        } 
+          clearInterval(this.pingIntervalId) // clear old keep-alive interval
+          // send a keep-alive message over the socket every 10 seconds to prevent socket timeouts in Firefox
+          this.pingIntervalId = setInterval(() => {
+            this.socket.send(JSON.stringify({type: `keepalive`}))
+          }, 1000*10);
+
+        } else {
+          return reject(new Error(`Socket opened but isn't ready`))
+        }
+
+        // overwrite the previous onclose-handler after the socket is connected
+        this.socket.onclose = (event) => {
+          store.dispatch(`setConnectedToBackend`, false) // update connection state in store
+          clearInterval(this.pingIntervalId) // clear keep-alive interval
+          alert(`Lost connection to server! (Code: '${event.code}', Reason: '${event.reason}')`)
+        }
+        
       }
 
+      // if the socket didn't open but threw an error
       this.socket.onerror = (error) => {
+        store.dispatch(`setConnectedToBackend`, false) // update connection state in store
+        clearInterval(this.pingIntervalId) // clear keep-alive interval
         return reject(error)
       }
-    
+
+      // if the socket closed without opening first. unlikely to happen
+      this.socket.onclose = () => {
+        store.dispatch(`setConnectedToBackend`, false) // update connection state in store
+        clearInterval(this.pingIntervalId) // clear keep-alive interval
+        return reject(new Error(`Can't connect to server!`))
+      }
+
     })
   }
 
-  //TODO
-  // - rename send to sendCommand, pass command and value as params
-  // - use Websocket.on(`message`) instead of Websocket.onmessage to support multiple event listeners
-  // - have sendCommand unlink the responseHandler, when a `commandEnd` message arrives from the server
-  // - remember all running commands in an array. only the last/newest command's handler is called to handle messages. once the responseHandler gets unlinked, pop the command and "return" to the previous handler
-  // - server should not send anything other than the requested data after a command is issued and before it is has ended => pause all other data (like live data)
-
+  /**
+   * ### Sends data to the backend API
+   * Mostly for debug, not actually used currently
+   * @param {Object} data the payload to send over the socket
+   * @param {Function} responseHandler a callback that receives any responses from the server, until this method is called again
+   */
   async send(data, responseHandler) {
     
-    console.log(`this.connected:`, this.connected);
+    // console.debug(`this.connected:`, this.connected);
     
+    // make sure we are connected to the backend API before sending any data
     if (!this.connected) {
 
       try {
@@ -92,17 +138,25 @@ export default class API {
       
     }
     
+    // stringify the data and send it over the socket
     this.socket.send(JSON.stringify(data))
 
-    //TODO allow to unlink handler
+    // register the callback as a message handler (parse the received message before calling the callback)
     this.socket.onmessage = (message) => {
       responseHandler(this.parseMessage(message))
     }
 
   }
 
+  /**
+   * ### Sends a command to the API and allows to handle responses to the command
+   * @param {String} command the commmand to send to the server
+   * @param {Object} payload the payload to send alongside the command
+   * @param {Function} responseHandler a callback for handling responses *to this command only*
+   */
   async sendCommand(command, payload, responseHandler) {
     
+    // make sure we are connected to the backend API
     if (!this.connected) {
 
       try {
@@ -113,6 +167,7 @@ export default class API {
       
     }
     
+    // format the command and payload, then send it
     this.socket.send(JSON.stringify({
       type: `command`,
       value: [
@@ -120,33 +175,43 @@ export default class API {
         ...payload
       ]
     }))
+
+    // remember the command by adding it and its responseHandler to `this.activeCommands` for later reference
     this.activeCommands.push({
       name: command,
       handler: responseHandler,
     })
 
+    // handle responses by the server
+    // this includes responses to *all* commands
     this.socket.onmessage = (message) => {
 
       let parsed = this.parseMessage(message)
 
-      console.log(`parsed:`, parsed);
-  
+      // find the command to which the server replied to 
       let command = this.activeCommands.find(x => x.name === parsed.value[0])
   
+      // if the command isn't part of `this.activeCommands`, ignore it
       if (!command) {
-        throw new Error(`Command not found: ${command}`)
+        console.warn(`Command not found: ${parsed.value[0]}`)
+        return
       }
   
+      // detect the type of the reply and handle accordingly
       switch (parsed.type) {
         case `response`:
+            // if the reply is a response, invoke the active command's response handler
             command.handler(parsed.value[1])    
           break;
         case `commandEnd`:
+          // if the reply is a command end, remove the command from the active commands
           this.activeCommands = this.activeCommands.filter(x => x !== command)
           break;
       
         case `error`:
-          console.error(`Command ${parsed.value[0]} threw an error:`, parsed.value[1])
+          // if the reply is an error, log it in the console
+          // the command hasn't ended yet
+          console.warn(`Command '${parsed.value[0]}' threw an error:`, parsed.value[1])
           break;
       
         default:
@@ -158,25 +223,201 @@ export default class API {
 
   }
   
-  getLivePackets() {
+  /**
+   * ### Subscribe to live packets from the backend
+   */
+  async getLivePackets() {
 
-    this.sendCommand(`live`,
+    console.info(`Now listening for live packets`)
+
+    await this.sendCommand(`packetsLive`,
       [],
       (response) => {
-        console.log(`response:`, response);
-        store.dispatch(`addPackets`, response)
+        // console.debug(`New live packets:`, response);
+        store.dispatch(`addPackets`, response) // adds the new packets to the store
+      }
+    )
+    
+  }
+
+  /**
+   * ### Unsubscribe from live packets from the backend
+   */
+  async endLivePackets() {
+
+    await this.sendCommand(`end`,
+      [`packetsLive`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
+        // currently the backend doesn't send a `commandEnd` reply for the live command
+        // this could be changed once the backend's GuiConnection class handles commands internally without relying on the consumer
+        this.activeCommands = this.activeCommands.filter(x => x !== `packetsLive`)
+      }
+    )
+    
+  }
+
+  /**
+   * ### Subscribe to live connections from the backend
+   */
+  async getLiveConnections() {
+
+    await this.sendCommand(`connectionsLive`,
+      [],
+      (response) => {
+        // console.debug(`New live connections:`, response)
+        store.dispatch(`setConnections`, response) // old connections will be overwritten, but the backend should always include *all* connections
+      }
+    )
+    
+  }
+
+  /**
+   * ### Unsubscribe from live connections from the backend
+   */
+  async endLiveConnections() {
+
+    await this.sendCommand(`end`,
+      [`connectionsLive`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
+        // currently the backend doesn't send a `commandEnd` reply for the live command
+        // this could be changed once the backend's GuiConnection class handles commands internally without relying on the consumer
+        this.activeCommands = this.activeCommands.filter(x => x !== `connection`)
+      }
+    )
+    
+  }
+
+  /**
+   * ### Subscribe to live advertisers from the backend
+   */
+  async getLiveAdvertisers() {
+
+    await this.sendCommand(`advertisersLive`,
+      [],
+      (response) => {
+        // console.debug(`New live Advertisers:`, response);
+        store.dispatch(`setAdvertisers`, response) // old advertisers will be overwritten, but the backend should always include *all* advertisers
+      }
+    )
+    
+  }
+
+  /**
+   * ### Unsubscribe from live advertisers from the backend
+   */
+  async endLiveAdvertisers() {
+
+    await this.sendCommand(`end`,
+      [`advertisersLive`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
+        // currently the backend doesn't send a `commandEnd` reply for the live command
+        // this could be changed once the backend's GuiConnection class handles commands internally without relying on the consumer
+        this.activeCommands = this.activeCommands.filter(x => x !== `advertiser`)
+      }
+    )
+    
+  }
+
+  /**
+   * ### Subscribe to live issues from the backend
+   */
+  async getLiveIssues() {
+
+    await this.sendCommand(`issuesLive`,
+      [],
+      (response) => {
+        // console.log(`New live Issues:`, response);
+        store.dispatch(`setIssues`, response) // old issues will be overwritten, but the backend should always include *all* issues (might have to be changed if there are too many issues)
+      }
+    )
+    
+  }
+
+  /**
+   * ### Unsubscribe from live issues from the backend
+   */
+  async endLiveIssues() {
+
+    await this.sendCommand(`end`,
+      [`issuesLive`],
+      (response) => {
+        console.info(`Unsubscribed successfully:`, response);
+        // currently the backend doesn't send a `commandEnd` reply for the live command
+        // this could be changed once the backend's GuiConnection class handles commands internally without relying on the consumer
+        this.activeCommands = this.activeCommands.filter(x => x !== `issuesLive`)
       }
     )
     
   }
   
+  /**
+   * ### Loads all sniffed packets from the backend and adds them to the store
+   * @returns {Promise}
+   */
   loadAllPackets() {
     return new Promise((resolve) => {
     
       this.sendCommand(`sendAll`,
         [],
         (response) => {
-          store.dispatch(`addPackets`, response)
+          store.dispatch(`setPackets`, response) // overwrites old packets and replaces them with the new packets
+          return resolve()
+        }
+      )
+    
+    })
+  }
+  
+  /**
+   * ### Loads all sniffed connections from the backend and adds them to the store
+   * @returns {Promise}
+   */
+  loadAllConnections() {
+    return new Promise((resolve) => {
+    
+      this.sendCommand(`connections`,
+        [],
+        (response) => {
+          store.dispatch(`setConnections`, response) // overwrites old connections and replaces them with the new connections
+          return resolve()
+        }
+      )
+    
+    })
+  }
+  
+  /**
+   * ### Loads all sniffed advertisers from the backend and adds them to the store
+   * @returns {Promise}
+   */
+  loadAllAdvertisers() {
+    return new Promise((resolve) => {
+    
+      this.sendCommand(`advertisers`,
+        [],
+        (response) => {
+          store.dispatch(`setAdvertisers`, response) // overwrites old advertisers and replaces them with the new advertisers
+          return resolve()
+        }
+      )
+    
+    })
+  }
+  
+  /**
+   * ### Loads all sniffed issues from the backend and adds them to the store
+   * @returns {Promise}
+   */
+  loadAllIssues() {
+    return new Promise((resolve) => {
+    
+      this.sendCommand(`issues`,
+        [],
+        (response) => {
+          store.dispatch(`setIssues`, response) // overwrites old issues and replaces them with the new issues
           return resolve()
         }
       )
@@ -184,10 +425,15 @@ export default class API {
     })
   }
 
+  /**
+   * ### Loads a single packet in `full` format
+   * @param {Number} packetId the id of the packet to load
+   * @returns {Promise<Object>} the requested packet in `full` format
+   */
   loadPacket(packetId) {
     return new Promise((resolve) => {
     
-      console.log(`packetId:`, packetId);
+      console.debug(`packetId:`, packetId);
 
       this.sendCommand(`send`,
         [
