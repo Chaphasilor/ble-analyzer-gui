@@ -95,6 +95,11 @@ export default {
   },
   mounted() {
 
+    // scroll to index if set
+    if (!isNaN(this.scrollToIndex)) {
+      this.$refs[`packet-list`].scrollToIndex(this.scrollToIndex)
+    }
+
     // prevent text selection on double click without preventing text selection by dragging
     document.addEventListener(`mousedown`, preventSelection, false);
     

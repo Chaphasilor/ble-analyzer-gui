@@ -31,6 +31,9 @@ export default {
   computed: {
     packetFilter() {
       return this.$store.getters.packetFilter
+    },
+    scrollToIndex() {
+      return this.$store.getters.scrollToIndex
     }
   },
   watch: {
@@ -40,7 +43,12 @@ export default {
       handler: function() {
         this.$emit(`input`, this.onFilterChange)
       }
-    }
+    },
+    scrollToIndex: {
+      handler: function() {
+        this.$emit(`input`, this.onFilterChange)
+      }
+    },
   },
   mounted() {
 

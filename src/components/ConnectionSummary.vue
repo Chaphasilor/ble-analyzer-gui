@@ -2,7 +2,7 @@
   <div
     class="grid content-center h-auto grid-flow-row gap-1 border-b border-gray-700 cursor-pointer hover:bg-gray-300 place-items-center"
     @dblclick="filterConnection()"
-    @click="details = propertiesAvailable ? !details : false"
+    @click="details = !details"
     title="Click to toggle details"
   >
 
@@ -31,10 +31,12 @@
       <span>{{ source.state }}</span>
       
       <button
-        class="block p-2 text-white bg-lightblue-600"
+        class="block p-2 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click.stop="filterConnection()"
       >Filter</button>
+
+      <!-- `chevron-down` icon from https://github.com/tabler/tabler-icons -->
 
       <svg
         v-if="!details"
@@ -48,6 +50,8 @@
         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
         <polyline points="6 9 12 15 18 9" />
       </svg>
+
+      <!-- `chevron-up` icon from https://github.com/tabler/tabler-icons -->
 
       <svg
         v-else
@@ -65,52 +69,65 @@
     </div>
 
     <div
-      v-if="details && propertiesAvailable"
+      v-if="details"
       class="w-full p-4 mt-2"
     >
 
       <div
-        class="mb-2 font-semibold"
-      >Connection Properties:</div>
-      
-      <table
-        class="w-full text-center"
+        v-if="propertiesAvailable"
       >
-        <tr
-          class="border-b border-gray-400"
-        >
-          <th class="font-normal">CRC Init</th>
-          <th class="font-normal">Window Size</th>
-          <th class="font-normal">Window Offset</th>
-          <th class="font-normal">Connection Interval</th>
-          <th class="font-normal">Slave Latency</th>
-          <th class="font-normal">Supervision Timeout</th>
-          <th class="font-normal">Channel Hop</th>
-          <th class="font-normal">Sleep Clock Accuracy</th>
-        </tr>
-        <tr>
-          <td class="font-mono">{{ source.properties.crcInit }}</td>
-          <td>{{ source.properties.windowSize }}</td>
-          <td>{{ source.properties.windowOffset }}</td>
-          <td>{{ source.properties.connectionInterval }}</td>
-          <td>{{ source.properties.slaveLatency }}</td>
-          <td>{{ source.properties.supervisionTimeout }}</td>
-          <td>{{ source.properties.channelHop }}</td>
-          <td>{{ source.properties.sleepClockAccuracy }}</td>
-        </tr>
 
-      </table>
-      
-      <div
-        class="mt-4 mb-2 font-semibold"
-      >Channel Map:</div>
-      <div class="flex flex-row justify-between">
         <div
-          v-for="([key, value]) of Object.entries(source.properties.channelMap)"
-          :key="key"
-          class="mx-2"
-          :class="value ? `font-bold` : `font-light`"
-        >{{ key }}</div>
+          class="mb-2 font-semibold"
+        >Connection Properties:</div>
+        
+        <table
+          class="w-full text-center"
+        >
+          <tr
+            class="border-b border-gray-400"
+          >
+            <th class="font-normal">CRC Init</th>
+            <th class="font-normal">Window Size</th>
+            <th class="font-normal">Window Offset</th>
+            <th class="font-normal">Connection Interval</th>
+            <th class="font-normal">Slave Latency</th>
+            <th class="font-normal">Supervision Timeout</th>
+            <th class="font-normal">Channel Hop</th>
+            <th class="font-normal">Sleep Clock Accuracy</th>
+          </tr>
+          <tr>
+            <td class="font-mono">{{ source.properties.crcInit }}</td>
+            <td>{{ source.properties.windowSize }}</td>
+            <td>{{ source.properties.windowOffset }}</td>
+            <td>{{ source.properties.connectionInterval }}</td>
+            <td>{{ source.properties.slaveLatency }}</td>
+            <td>{{ source.properties.supervisionTimeout }}</td>
+            <td>{{ source.properties.channelHop }}</td>
+            <td>{{ source.properties.sleepClockAccuracy }}</td>
+          </tr>
+
+        </table>
+        
+        <div
+          class="mt-4 mb-2 font-semibold"
+        >Channel Map:</div>
+        <div class="flex flex-row justify-between">
+          <div
+            v-for="([key, value]) of Object.entries(source.properties.channelMap)"
+            :key="key"
+            class="mx-2"
+            :class="value ? `font-bold` : `font-light`"
+          >{{ key }}</div>
+        </div>
+
+      </div>
+
+      <div
+        v-else
+        class="text-center"
+      >
+        No additional data available because the start of the connection wasn't detected
       </div>
 
     </div>

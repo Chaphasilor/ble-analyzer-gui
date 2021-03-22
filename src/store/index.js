@@ -126,6 +126,19 @@ export default new Vuex.Store({
       
     },
     /**
+     * ### Resets the backend websocket url to the current value inside the API instance
+     * Doesn't do anything if there is no old url
+     */
+     resetBackendUrl(context) {
+
+      if (api.url && api.url.length > 0) {
+
+        context.dispatch(`setBackendUrl`, api.url)
+        context.dispatch(`connectToServer`)
+        
+      }
+    },
+    /**
      * ### Connects to the backend through the API
      */
     connectToServer() {

@@ -1,11 +1,13 @@
 <template>
   <div
     class="grid h-screen p-0 m-0 grid-rows-main grid-cols-main"
+    @keydown.esc="resetBackendUrl()"
   >
     
     <BackendConnectionDialog
       v-if="backendUrl === ``"
       class="fixed z-10 w-full h-full m-auto mx-auto"
+      @keydown.esc="resetBackendUrl()"
     />
     
     <Header
@@ -107,5 +109,12 @@ export default {
       this.detailsOpen = !isNaN(this.selectedPacket) // open details if a packet gets selected
     }
   },
+  methods: {
+    resetBackendUrl() {
+      if (this.backendUrl === ``) {
+        this.$store.dispatch(`resetBackendUrl`)
+      }
+    }
+  }
 }
 </script>

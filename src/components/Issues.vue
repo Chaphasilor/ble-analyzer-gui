@@ -69,7 +69,7 @@ export default {
 
       switch (issueType) {
         case `warning`:
-          backgroundAndFontColor = `bg-orange-300 hover:bg-red-400 text-black`
+          backgroundAndFontColor = `bg-orange-300 hover:bg-orange-500 hover:bg-orange-400 text-black`
           break;
 
         case `alert`:

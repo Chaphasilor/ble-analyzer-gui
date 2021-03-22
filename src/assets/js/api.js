@@ -62,6 +62,7 @@ export default class API {
         this.socket = new WebSocket(this.url)
       } catch (err) {
         store.dispatch(`setConnectedToBackend`, false)
+        clearInterval(this.pingIntervalId) // clear keep-alive interval
         throw err
       }
   
@@ -80,6 +81,12 @@ export default class API {
             return resolve()
           }
 
+          clearInterval(this.pingIntervalId) // clear old keep-alive interval
+          // send a keep-alive message over the socket every 10 seconds to prevent socket timeouts in Firefox
+          this.pingIntervalId = setInterval(() => {
+            this.socket.send(JSON.stringify({type: `keepalive`}))
+          }, 1000*10);
+
         } else {
           return reject(new Error(`Socket opened but isn't ready`))
         }
@@ -87,6 +94,7 @@ export default class API {
         // overwrite the previous onclose-handler after the socket is connected
         this.socket.onclose = (event) => {
           store.dispatch(`setConnectedToBackend`, false) // update connection state in store
+          clearInterval(this.pingIntervalId) // clear keep-alive interval
           alert(`Lost connection to server! (Code: '${event.code}', Reason: '${event.reason}')`)
         }
         
@@ -95,12 +103,14 @@ export default class API {
       // if the socket didn't open but threw an error
       this.socket.onerror = (error) => {
         store.dispatch(`setConnectedToBackend`, false) // update connection state in store
+        clearInterval(this.pingIntervalId) // clear keep-alive interval
         return reject(error)
       }
 
       // if the socket closed without opening first. unlikely to happen
       this.socket.onclose = () => {
         store.dispatch(`setConnectedToBackend`, false) // update connection state in store
+        clearInterval(this.pingIntervalId) // clear keep-alive interval
         return reject(new Error(`Can't connect to server!`))
       }
 

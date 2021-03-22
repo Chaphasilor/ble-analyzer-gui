@@ -4,7 +4,7 @@
   >
 
     <div
-      class="w-auto h-full p-6 my-64 text-center text-gray-900 bg-gray-300 border-4 border-gray-500 mx-96"
+      class="w-auto h-auto p-6 my-64 text-center text-gray-900 bg-gray-300 border-4 border-gray-500 min-w-min mx-96"
     >
 
       <h2
@@ -21,7 +21,8 @@
         <input
           id="backend-url"
           ref="backend-url"
-          class="w-full max-w-xl p-2 mt-2"
+          class="max-w-xl p-2 mt-2 w-72 2xl:w-full"
+          size="200"
           type="text"
           name="backend-url"
           placeholder="Enter URL here, either ws:// or wss:// protocol"
@@ -30,7 +31,7 @@
         <br>
 
         <input
-          class="p-2 mt-10 text-white cursor-pointer bg-lightblue-600"
+          class="p-2 mt-10 text-white cursor-pointer bg-lightblue-600 hover:bg-lightblue-500"
           type="submit"
           value="Confirm URL"
         >
@@ -50,7 +51,7 @@ export default {
 
       this.$store.dispatch(`updateBackendUrl`, this.$refs[`backend-url`].value)
       
-    }
+    },
   }
 }
 </script>

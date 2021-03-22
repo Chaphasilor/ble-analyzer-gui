@@ -31,10 +31,11 @@
       <!-- Settings (Backend URL setup) -->
 
       <button
-        class="p-2 text-white bg-lightblue-600"
+        class="p-2 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click="$store.dispatch(`setBackendUrl`, ``)"
       >
+        <!-- `settings` icon from https://github.com/tabler/tabler-icons -->
         <svg
           class="w-8 h-8 stroke-current stroke-1.5"
           viewBox="0 0 24 24"
@@ -52,7 +53,7 @@
       <!-- Buttons to control the GUI -->
 
       <button
-        class="p-2 mr-1 text-white bg-lightblue-600"
+        class="p-2 mr-1 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click="$store.dispatch(`receiveLive`)"
       >
@@ -60,7 +61,7 @@
       </button>
 
       <button
-        class="p-2 mr-1 text-white bg-lightblue-600"
+        class="p-2 mr-1 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click="$store.dispatch(`loadEverything`)"
       >
@@ -68,7 +69,7 @@
       </button>
 
       <!-- <button
-        class="p-2 mr-1 text-white bg-lightblue-600"
+        class="p-2 mr-1 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click="$store.dispatch(`loadAllPackets`)"
       >
@@ -76,7 +77,7 @@
       </button>
 
       <button
-        class="p-2 mr-1 text-white bg-lightblue-600"
+        class="p-2 mr-1 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click="$store.dispatch(`loadAllConnections`)"
       >
@@ -84,7 +85,7 @@
       </button>
 
       <button
-        class="p-2 mr-1 text-white bg-lightblue-600"
+        class="p-2 mr-1 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click="$store.dispatch(`loadAllAdvertisers`)"
       >
@@ -92,7 +93,7 @@
       </button>
 
       <button
-        class="p-2 mr-1 text-white bg-lightblue-600"
+        class="p-2 mr-1 text-white bg-lightblue-600 hover:bg-lightblue-500"
         type="button"
         @click="$store.dispatch(`loadAllIssues`)"
       >
@@ -101,7 +102,7 @@
 
       <button
         v-if="$store.getters.packets.length > 0"
-        class="p-2 mr-1 text-white bg-orange-400"
+        class="p-2 mr-1 text-white bg-orange-500 hover:bg-orange-400"
         type="button"
         @click="$store.dispatch(`clearEverything`)"
       >
@@ -110,7 +111,7 @@
 
       <!-- <button
         v-if="$store.getters.packets.length > 0"
-        class="p-2 mr-1 text-white bg-orange-400"
+        class="p-2 mr-1 text-white bg-orange-500 hover:bg-orange-400"
         type="button"
         @click="$store.dispatch(`clearPackets`)"
       >
@@ -119,7 +120,7 @@
 
       <button
         v-if="$store.getters.connections.length > 0"
-        class="p-2 mr-1 text-white bg-orange-400"
+        class="p-2 mr-1 text-white bg-orange-500 hover:bg-orange-400"
         type="button"
         @click="$store.dispatch(`clearConnections`)"
       >
@@ -128,7 +129,7 @@
 
       <button
         v-if="$store.getters.advertisers.length > 0"
-        class="p-2 mr-1 text-white bg-orange-400"
+        class="p-2 mr-1 text-white bg-orange-500 hover:bg-orange-400"
         type="button"
         @click="$store.dispatch(`clearAdvertisers`)"
       >
@@ -137,7 +138,7 @@
 
       <button
         v-if="$store.getters.issues.length > 0"
-        class="p-2 mr-1 text-white bg-orange-400"
+        class="p-2 mr-1 text-white bg-orange-500 hover:bg-orange-400"
         type="button"
         @click="$store.dispatch(`clearIssues`)"
       >
@@ -146,7 +147,7 @@
 
       <button
         v-if="$store.getters.packetFilter.length > 0"
-        class="p-2 mr-1 text-white bg-orange-400"
+        class="p-2 mr-1 text-white bg-orange-500 hover:bg-orange-400"
         type="button"
         @click="$store.dispatch(`clearPacketFilter`)"
       >
@@ -155,7 +156,7 @@
 
       <button
         v-if="$store.getters.liveActive"
-        class="p-2 mr-1 text-white bg-orange-400"
+        class="p-2 mr-1 text-white bg-orange-500 hover:bg-orange-400"
         type="button"
         @click="$store.dispatch(`stopLive`)"
       >
